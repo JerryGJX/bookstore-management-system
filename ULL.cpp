@@ -149,10 +149,10 @@ bool UnrolledLinkedList::Add(const Node &x) {
     int pos = block_info.FindPosition(x);
     Block target_block;
     block_list.Read(target_block, block_info.arr[pos].position);
-    std::cerr << "# " << target_block.Begin().key << '\n';
-    std::cerr << "# " << target_block.Begin().value << '\n';
-    std::cerr << "# " << target_block.End().key << '\n';
-    std::cerr << "# " << target_block.End().value << '\n';
+//    std::cerr << "# " << target_block.Begin().key << '\n';
+//    std::cerr << "# " << target_block.Begin().value << '\n';
+//    std::cerr << "# " << target_block.End().key << '\n';
+//    std::cerr << "# " << target_block.End().value << '\n';
 
     if (target_block.Add(x)) {
         block_info.arr[pos].tail = target_block.End();
