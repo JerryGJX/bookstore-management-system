@@ -40,7 +40,9 @@ bool Block::Del(const Node &x) {
     int pos = static_cast<int>(std::lower_bound(array, array + num, x) - array);
     if (array[pos] != x) return false;
     else {
-        for (int i = num - 1; i > pos; --i) array[i - 1] = array[i];
+        for (int i = pos+1; i <num; ++i) {
+            array[i - 1] = array[i];
+        }
         array[num-1] = Node();
         --num;
         return true;
@@ -147,10 +149,10 @@ bool UnrolledLinkedList::Add(const Node &x) {
     int pos = block_info.FindPosition(x);
     Block target_block;
     block_list.Read(target_block, block_info.arr[pos].position);
-//    std::cerr << "# " << target_block.Begin().key << '\n';
-//    std::cerr << "# " << target_block.Begin().value << '\n';
-//    std::cerr << "# " << target_block.End().key << '\n';
-//    std::cerr << "# " << target_block.End().value << '\n';
+    std::cerr << "# " << target_block.Begin().key << '\n';
+    std::cerr << "# " << target_block.Begin().value << '\n';
+    std::cerr << "# " << target_block.End().key << '\n';
+    std::cerr << "# " << target_block.End().value << '\n';
 
     if (target_block.Add(x)) {
         block_info.arr[pos].tail = target_block.End();
