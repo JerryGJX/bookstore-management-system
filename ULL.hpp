@@ -13,12 +13,13 @@
 #include "MemoryRiver.hpp"
 
 
-#define BLOCK_SIZE 340
-#define BLOCK_SPLIT_LIMIT 300
-#define BLOCK_SPLIT_LEFT 150
+#define BLOCK_SIZE 640
+#define BLOCK_SPLIT_LIMIT 600
+#define BLOCK_SPLIT_LEFT 300
 #define BLOCK_MERGE_LIMIT 30
 #define KEY_SIZE 65
 #define BLOCK_NUM_LIMIT 350
+
 
 struct Node {
     int value;
