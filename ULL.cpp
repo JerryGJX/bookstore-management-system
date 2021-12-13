@@ -14,9 +14,8 @@ bool Node::operator==(const Node &x) const { return (key == x.key && value == x.
 bool Node::operator!=(const Node &x) const { return (key != x.key || value != x.value); }
 
 //............class block..............
-Block::Block(const int &arr_num_, const Node *array_) {
-    num = arr_num_;
-    for (int i = 0; i < arr_num_; i++) { array[i] = array_[i]; }
+Block::Block(const int &arr_num_, const Node *array_) : num(arr_num_) {
+    memcpy(array, array_, (num) * sizeof(Node));
 }
 
 const int &Block::Size() const { return num; }
@@ -53,11 +52,10 @@ void Block::Erase(const int &start_point) {
     for (int i = start_point; i < num; ++i) { array[i] = Node(); }
 }
 
-Block Block::Split() {
+void Block::Split(Block &receiver) {
     int new_block_num = num - BLOCK_SPLIT_LEFT;
-    num = BLOCK_SPLIT_LEFT;
-    Erase(num);
-    return {new_block_num, array + num};
+    receiver = Block(new_block_num, array+BLOCK_SPLIT_LEFT);
+    Erase(BLOCK_SPLIT_LEFT);num = BLOCK_SPLIT_LEFT;
 }
 
 Block &Block::Merge(Block &x) {//默认x在this后
@@ -94,6 +92,7 @@ BlockInfo::BlockInfo(const Node &x, int position_) {
 
 void BlockGallery::Add(const BlockInfo &x) {
     int pos;
+    block_num++;
     pos = static_cast<int>(std::lower_bound(arr, arr + block_num, x) - arr);
     for (int i = block_num - 1; i >= pos; --i) { arr[i + 1] = arr[i]; }
     arr[pos] = x;
@@ -157,7 +156,8 @@ bool UnrolledLinkedList::Add(const Node &x) {
     if (target_block.Add(x)) {
         block_info.arr[pos].tail = target_block.End();
         if (target_block.Size() >= BLOCK_SPLIT_LIMIT) {
-            Block new_block = target_block.Split();
+            Block new_block ;
+            target_block.Split(new_block);
             BlockInfo new_block_info;
             new_block_info.tail = new_block.End();
             new_block_info.position = block_list.Write(new_block);
