@@ -9,7 +9,9 @@
 #include <filesystem>
 
 #ifdef MyDebug
+
 #include <iostream>
+
 #endif
 
 using std::string;
@@ -85,7 +87,7 @@ public:
         file.write(reinterpret_cast<char *>(&next), 4);
         file.write(reinterpret_cast<const char *>(&t), sizeofT);
         file.close();
-        return pos;
+        return pos - InfoLength;
     }
 
     //用t的值更新位置索引index对应的对象，保证调用的index都是由write函数产生
@@ -110,7 +112,7 @@ public:
     void Delete(int index) {
         /* your code here */
         file.open(file_name);
-        file.seekp(index+sizeof(int) + InfoLength);
+        file.seekp(index + sizeof(int) + InfoLength);
         file.write(reinterpret_cast<char *>(&free_head), 4);
         free_head = index + InfoLength;
         file.close();

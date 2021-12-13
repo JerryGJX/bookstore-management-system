@@ -55,7 +55,7 @@ public:
 
     bool Del(const Node &);
 
-    Block Split();
+    void Split(Block &);
 
     void Erase(const int &);
 
