@@ -39,10 +39,10 @@ bool Block::Del(const Node &x) {
     int pos = static_cast<int>(std::lower_bound(array, array + num, x) - array);
     if (array[pos] != x) return false;
     else {
-        for (int i = pos+1; i <num; ++i) {
+        for (int i = pos + 1; i < num; ++i) {
             array[i - 1] = array[i];
         }
-        array[num-1] = Node();
+        array[num - 1] = Node();
         --num;
         return true;
     }
@@ -54,8 +54,9 @@ void Block::Erase(const int &start_point) {
 
 void Block::Split(Block &receiver) {
     int new_block_num = num - BLOCK_SPLIT_LEFT;
-    receiver = Block(new_block_num, array+BLOCK_SPLIT_LEFT);
-    Erase(BLOCK_SPLIT_LEFT);num = BLOCK_SPLIT_LEFT;
+    receiver = Block(new_block_num, array + BLOCK_SPLIT_LEFT);
+    Erase(BLOCK_SPLIT_LEFT);
+    num = BLOCK_SPLIT_LEFT;
 }
 
 Block &Block::Merge(Block &x) {//默认x在this后
@@ -93,8 +94,8 @@ BlockInfo::BlockInfo(const Node &x, int position_) {
 void BlockGallery::Add(const BlockInfo &x) {
     int pos;
     //block_num++;
-    pos = static_cast<int>(std::lower_bound(arr, arr + block_num-1, x) - arr);
-    if(x.tail<arr[block_num-1].tail){pos=pos;}else{pos++;}
+    pos = static_cast<int>(std::lower_bound(arr, arr + block_num - 1, x) - arr);
+    if (x.tail < arr[block_num - 1].tail) { pos = pos; } else { pos++; }
     block_num++;
     for (int i = block_num - 1; i >= pos; --i) { arr[i + 1] = arr[i]; }
     arr[pos] = x;
@@ -118,8 +119,12 @@ void BlockGallery::Update(const BlockInfo &x, const int &pos_) { arr[pos_] = x; 
 
 int BlockGallery::FindPosition(const Node &x) const {
     int pos;
-    pos = static_cast<int>(std::lower_bound(arr, arr + block_num, x) - arr);
-    pos = (pos == 0) ? pos : pos - 1;
+    pos = static_cast<int>(std::lower_bound(arr, arr + block_num - 1, x) - arr);
+//    if(x<arr[block_num-1].tail){
+//        pos=pos;
+//    }else{
+//        pos++;
+//    }
     return pos;
 }
 
@@ -157,7 +162,7 @@ bool UnrolledLinkedList::Add(const Node &x) {
     if (target_block.Add(x)) {
         block_info.arr[pos].tail = target_block.End();
         if (target_block.Size() >= BLOCK_SPLIT_LIMIT) {
-            Block new_block ;
+            Block new_block;
             target_block.Split(new_block);
             BlockInfo new_block_info;
             new_block_info.tail = new_block.End();
@@ -179,13 +184,27 @@ bool UnrolledLinkedList::Del(const Node &x) {
     block_list.Read(target_block, block_info.arr[pos].position);
     if (target_block.Del(x)) {
         block_info.arr[pos].tail = target_block.End();
-        if (pos < block_info.block_num - 1) {
-            if (target_block.Size() <= BLOCK_MERGE_LIMIT) {
+        if (target_block.Size() <= BLOCK_MERGE_LIMIT && block_info.block_num > 1) {
+            if (pos != (block_info.block_num - 1)) {
                 Block next_block;
                 block_list.Read(next_block, block_info.arr[pos + 1].position);
                 target_block.Merge(next_block);
                 block_list.Delete(block_info.arr[pos + 1].position);
                 block_info.Del(pos + 1);
+                block_list.Update(target_block, block_info.arr[pos].position);
+                block_info.arr[pos].tail = target_block.End();
+                PutInfo();
+                return true;
+            } else {
+                Block prev_block;
+                block_list.Read(prev_block, block_info.arr[pos - 1].position);
+                prev_block.Merge(target_block);
+                block_list.Delete(block_info.arr[pos].position);
+                block_info.Del(pos);
+                block_list.Update(prev_block, block_info.arr[pos-1].position);
+                block_info.arr[pos-1].tail = prev_block.End();
+                PutInfo();
+                return true;
             }
         }
         block_list.Update(target_block, block_info.arr[pos].position);
