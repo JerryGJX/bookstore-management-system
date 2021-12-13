@@ -92,11 +92,12 @@ BlockInfo::BlockInfo(const Node &x, int position_) {
 
 void BlockGallery::Add(const BlockInfo &x) {
     int pos;
+    //block_num++;
+    pos = static_cast<int>(std::lower_bound(arr, arr + block_num-1, x) - arr);
+    if(x.tail<arr[block_num-1].tail){pos=pos;}else{pos++;}
     block_num++;
-    pos = static_cast<int>(std::lower_bound(arr, arr + block_num, x) - arr);
     for (int i = block_num - 1; i >= pos; --i) { arr[i + 1] = arr[i]; }
     arr[pos] = x;
-    block_num++;
 }
 
 void BlockGallery::Del(const BlockInfo &x) {
@@ -161,6 +162,7 @@ bool UnrolledLinkedList::Add(const Node &x) {
             BlockInfo new_block_info;
             new_block_info.tail = new_block.End();
             new_block_info.position = block_list.Write(new_block);
+            block_info.arr[pos].tail = target_block.End();
             block_info.Add(new_block_info);
         }
         block_list.Update(target_block, block_info.arr[pos].position);
