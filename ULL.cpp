@@ -42,14 +42,13 @@ bool Block::Del(const Node &x) {
         for (int i = pos + 1; i < num; ++i) {
             array[i - 1] = array[i];
         }
-        array[num - 1] = Node();
-        --num;
+        array[--num] = Node();
         return true;
     }
 }
 
 void Block::Erase(const int &start_point) {
-    for (int i = start_point; i < num; ++i) { array[i] = Node(); }
+    //for (int i = start_point; i < num; ++i) { array[i] = Node(); }
 }
 
 void Block::Split(Block &receiver) {
@@ -119,11 +118,6 @@ void BlockGallery::Update(const BlockInfo &x, const int &pos_) { arr[pos_] = x; 
 int BlockGallery::FindPosition(const Node &x) const {
     int pos;
     pos = static_cast<int>(std::lower_bound(arr, arr + block_num - 1, x) - arr);
-//    if(x<arr[block_num-1].tail){
-//        pos=pos;
-//    }else{
-//        pos++;
-//    }
     return pos;
 }
 
@@ -153,10 +147,16 @@ bool UnrolledLinkedList::Add(const Node &x) {
     int pos = block_info.FindPosition(x);
     Block target_block;
     block_list.Read(target_block, block_info.arr[pos].position);
-//    std::cerr << "# " << target_block.Begin().key << '\n';
-//    std::cerr << "# " << target_block.Begin().value << '\n';
-//    std::cerr << "# " << target_block.End().key << '\n';
-//    std::cerr << "# " << target_block.End().value << '\n';
+
+//    for (int i = 0; i < block_info.block_num; i++) {
+//        Block test_block;
+//        block_list.Read(test_block, block_info.arr[i].position);
+//        std::cerr << "# " << test_block.Begin().key << '\n';
+//        std::cerr << "# " << test_block.Begin().value << '\n';
+//        std::cerr << "# " << test_block.End().key << '\n';
+//        std::cerr << "# " << test_block.End().value << '\n';
+//    }
+
 
     if (target_block.Add(x)) {
         block_info.arr[pos].tail = target_block.End();
@@ -181,12 +181,23 @@ bool UnrolledLinkedList::Del(const Node &x) {
     int pos = block_info.FindPosition(x);
     Block target_block;
     block_list.Read(target_block, block_info.arr[pos].position);
+
+//    for (int i = 0; i < block_info.block_num; i++) {
+//        Block test_block;
+//        block_list.Read(test_block, block_info.arr[i].position);
+//        std::cerr << "# " << test_block.Begin().key << '\n';
+//        std::cerr << "# " << test_block.Begin().value << '\n';
+//        std::cerr << "# " << test_block.End().key << '\n';
+//        std::cerr << "# " << test_block.End().value << '\n';
+//    }
+
     if (target_block.Del(x)) {
-        block_info.arr[pos].tail = target_block.End();
-        if (target_block.Size() <= BLOCK_MERGE_LIMIT && block_info.block_num > 1) {
-            if (pos != (block_info.block_num - 1)) {
-                Block next_block;
-                block_list.Read(next_block, block_info.arr[pos + 1].position);
+        if (pos != (block_info.block_num - 1)) {
+            block_info.arr[pos].tail = target_block.End();
+            Block next_block;
+            block_list.Read(next_block, block_info.arr[pos + 1].position);
+            if (target_block.Size() <= BLOCK_MERGE_LIMIT &&
+                target_block.Size() + next_block.Size() <= BLOCK_SPLIT_LIMIT) {
                 target_block.Merge(next_block);
                 block_list.Delete(block_info.arr[pos + 1].position);
                 block_info.Del(pos + 1);
@@ -194,17 +205,13 @@ bool UnrolledLinkedList::Del(const Node &x) {
                 block_info.arr[pos].tail = target_block.End();
                 PutInfo();
                 return true;
-            } else {
-                Block prev_block;
-                block_list.Read(prev_block, block_info.arr[pos - 1].position);
-                prev_block.Merge(target_block);
-                block_list.Delete(block_info.arr[pos].position);
-                block_info.Del(pos);
-                block_list.Update(prev_block, block_info.arr[pos-1].position);
-                block_info.arr[pos-1].tail = prev_block.End();
-                PutInfo();
-                return true;
             }
+        }
+        if (target_block.Size() == 0 && block_info.block_num > 1) {
+            block_list.Delete(block_info.arr[pos].position);
+            block_info.Del(pos);
+            PutInfo();
+            return true;
         }
         block_list.Update(target_block, block_info.arr[pos].position);
         PutInfo();

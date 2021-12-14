@@ -11,10 +11,8 @@
 
 template<int maxLength = 65>
 struct Char {
-private:
     // +1 是因为要存结尾 '\0'
     char content[maxLength]{};
-public:
     // 默认为空字符串
     Char() = default;
 

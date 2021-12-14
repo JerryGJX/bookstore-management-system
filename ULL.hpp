@@ -13,16 +13,16 @@
 #include "MemoryRiver.hpp"
 
 
-#define BLOCK_SIZE 100030
-#define BLOCK_SPLIT_LIMIT 100020
+#define BLOCK_SIZE 640
+#define BLOCK_SPLIT_LIMIT 600
 #define BLOCK_SPLIT_LEFT 300
-#define BLOCK_MERGE_LIMIT 30
+#define BLOCK_MERGE_LIMIT 100
 #define KEY_SIZE 65
-#define BLOCK_NUM_LIMIT 1
+#define BLOCK_NUM_LIMIT 300
 
 
 struct Node {
-    int value;
+    int value = 0;
     Char<KEY_SIZE> key;
 
     Node() = default;
@@ -42,7 +42,7 @@ private:
     int num = 0;
     Node array[BLOCK_SIZE];
 public:
-    Block()=default;
+    Block() = default;
 
     Block(const int &arr_num_, const Node *array_);
 
@@ -66,7 +66,7 @@ public:
 };
 
 struct BlockInfo {
-    int position;//存的是在info_length后多少
+    int position = 0;//存的是在info_length后多少
     Node tail;
 
     BlockInfo() = default;

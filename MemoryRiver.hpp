@@ -32,10 +32,10 @@ public:
 
     MemoryRiver(const string &file_name) : file_name(file_name) {
 //        file.open(file_name);
-#ifdef MyDebug
-        std::filesystem::remove(file_name);
-        std::cout << file_name << " deleted" << std::endl;
-#endif
+//#ifdef MyDebug
+//        std::filesystem::remove(file_name);
+//        std::cout << file_name << " deleted" << std::endl;
+//#endif
         if (!std::filesystem::exists(file_name)) {
 //            file.clear();
             file.open(file_name, std::ios::out);
@@ -43,13 +43,13 @@ public:
             InfoType info;
             file.write(reinterpret_cast<char *>(&info), InfoLength);
             file.seekp(InfoLength, std::ios::beg);
-            file.write(reinterpret_cast<char *>(&free_head), 4);
+            file.write(reinterpret_cast<char *>(&free_head), sizeof(int));
             T t;
             file.write(reinterpret_cast<char *>(&t), sizeofT);
         } else {
             file.open(file_name);
             file.seekp(InfoLength, std::ios::beg);
-            file.read(reinterpret_cast<char *>(&free_head), 4);
+            file.read(reinterpret_cast<char *>(&free_head), sizeof(int));
         }
         file.close();
     }
@@ -68,7 +68,7 @@ public:
     void GetInfo(InfoType &receiver) {
         file.open(file_name);
         file.seekg(0, std::ios::beg);
-        file.write(reinterpret_cast<char *>(&receiver), InfoLength);
+        file.read(reinterpret_cast<char *>(&receiver), InfoLength);
         file.close();
     }
 
@@ -78,13 +78,13 @@ public:
         int pos, next = 0;
         if (free_head) {
             file.seekp(free_head), pos = file.tellp();
-            file.read(reinterpret_cast<char *>(&next), 4);
+            file.read(reinterpret_cast<char *>(&next), sizeof(int));
             file.seekg(-4, std::ios::cur);
             free_head = next, next = 0;
         } else {
             file.seekp(0, std::ios::end), pos = file.tellp();
         }
-        file.write(reinterpret_cast<char *>(&next), 4);
+        file.write(reinterpret_cast<char *>(&next), sizeof(int));
         file.write(reinterpret_cast<const char *>(&t), sizeofT);
         file.close();
         return pos - InfoLength;
@@ -113,7 +113,7 @@ public:
         /* your code here */
         file.open(file_name);
         file.seekp(index + sizeof(int) + InfoLength);
-        file.write(reinterpret_cast<char *>(&free_head), 4);
+        file.write(reinterpret_cast<char *>(&free_head), sizeof(int));
         free_head = index + InfoLength;
         file.close();
     }
