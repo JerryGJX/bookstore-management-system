@@ -60,7 +60,7 @@ public:
 
     void Erase(const int &);
 
-    Block &Merge(Block &);
+    void Merge(Block &);
 
     void Find(const std::string &, std::vector<int> &) const;
 };
@@ -85,7 +85,7 @@ public:
 
     void Add(const BlockInfo &);
 
-    void Del(const BlockInfo &);
+    //void Del(const BlockInfo &);
 
     void Del(const int &);
 
