@@ -58,12 +58,11 @@ void Block::Split(Block &receiver) {
     num = BLOCK_SPLIT_LEFT;
 }
 
-Block &Block::Merge(Block &x) {//默认x在this后
+void Block::Merge(Block &x) {//默认x在this后
     for (int i = num; i < num + x.num; ++i) { array[i] = x.array[i - num]; }
     x.Erase(0);
     num += x.num;
     x.num = 0;
-    return *this;
 }
 
 void Block::Find(const std::string &key_, std::vector<int> &find_list) const {
@@ -99,13 +98,13 @@ void BlockGallery::Add(const BlockInfo &x) {
     arr[pos] = x;
 }
 
-void BlockGallery::Del(const BlockInfo &x) {
-    int pos;
-    pos = static_cast<int>(std::lower_bound(arr, arr + block_num, x) - arr);
-    for (int i = pos; i < block_num - 1; ++i) { arr[i] = arr[i + 1]; }
-    arr[block_num - 1] = BlockInfo();
-    block_num--;
-}
+//void BlockGallery::Del(const BlockInfo &x) {
+//    int pos;
+//    pos = static_cast<int>(std::lower_bound(arr, arr + block_num, x) - arr);
+//    for (int i = pos; i < block_num - 1; ++i) { arr[i] = arr[i + 1]; }
+//    arr[block_num - 1] = BlockInfo();
+//    block_num--;
+//}
 
 void BlockGallery::Del(const int &index_) {
     for (int i = index_; i < block_num - 1; ++i) { arr[i] = arr[i + 1]; }
