@@ -11,7 +11,7 @@ using std::cin;
 
 int main() {
 
-    UnrolledLinkedList list("data");
+    UnrolledLinkedList<Node> list("data");
     int n;
 
     string receiver;
