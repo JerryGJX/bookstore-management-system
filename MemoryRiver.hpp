@@ -54,6 +54,10 @@ public:
         file.close();
     }
 
+    //在文件合适位置写入类对象t，并返回写入的位置索引index
+    //位置索引意味着当输入正确的位置索引index，在以下三个函数中都能顺利的找到目标对象进行操作
+    //位置索引index可以取为对象写入的起始位置
+
     void WriteInfo(const InfoType &info_) {
         file.open(file_name);
         file.seekp(0, std::ios::beg);
@@ -67,10 +71,10 @@ public:
         file.read(reinterpret_cast<char *>(&receiver), InfoLength);
         file.close();
     }
-    
-     //在文件合适位置写入类对象t，并返回写入的位置索引index
-    //位置索引意味着当输入正确的位置索引index，在以下三个函数中都能顺利的找到目标对象进行操作
-    //位置索引index可以取为对象写入的起始位置
+
+    int ReturnInfoLength(){
+      return InfoLength;
+    }
 
     int Write(T &t) {
         /* your code here */
@@ -90,6 +94,7 @@ public:
         return pos - InfoLength;
     }
 
+    //用t的值更新位置索引index对应的对象，保证调用的index都是由write函数产生
     void Update(T &t, const int index) {
         /* your code here */
         file.open(file_name);
@@ -98,6 +103,7 @@ public:
         file.close();
     }
 
+    //读出位置索引index对应的T对象的值并赋值给t，保证调用的index都是由write函数产生
     void Read(T &t, const int index) {
         /* your code here */
         file.open(file_name);
@@ -106,6 +112,7 @@ public:
         file.close();
     }
 
+    //删除位置索引index对应的对象(不涉及空间回收时，可忽略此函数)，保证调用的index都是由write函数产生
     void Delete(int index) {
         /* your code here */
         file.open(file_name);

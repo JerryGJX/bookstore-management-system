@@ -19,23 +19,6 @@
 #define KEY_SIZE 65
 #define BLOCK_NUM_LIMIT 317
 
-struct Node {
-  int value = 0;
-  Char<KEY_SIZE> key;
-
-  Node() = default;
-
-  Node(const std::string &, const int &);
-
-  bool operator<(const Node &) const;
-
-  bool operator==(const Node &) const;
-
-  bool operator!=(const Node &) const;
-
-};
-
-
 template<class NodeType>
 class Block {
  private:
@@ -63,6 +46,8 @@ class Block {
   void Merge(Block &);
 
   void Find(const std::string &, std::vector<int> &) const;
+
+  NodeType &operator[](const int &index_);
 };
 
 template<class NodeType>
@@ -79,7 +64,7 @@ struct BlockInfo {
   bool operator<(const BlockInfo &) const;
 };
 
-template <class NodeType>
+template<class NodeType>
 struct BlockGallery {
  public:
   int block_num = 1;
@@ -95,7 +80,6 @@ struct BlockGallery {
 
   int FindPosition(const NodeType &) const;
 };
-
 
 template<class NodeType>
 class UnrolledLinkedList {
@@ -119,20 +103,9 @@ class UnrolledLinkedList {
   bool Del(const NodeType &);
 
   bool Query(const std::string &, std::vector<int> &);
+
+  void GetAll(std::vector<NodeType> &find_list_);
 };
-
-//...........class Node...........
-
-Node::Node(const std::string &key_, const int &value_) : value(value_) { key = key_; }
-
-bool Node::operator<(const Node &x) const {
-  if (key != x.key)return key < x.key;
-  else return value < x.value;
-}
-
-bool Node::operator==(const Node &x) const { return (key == x.key && value == x.value); }
-
-bool Node::operator!=(const Node &x) const { return (key != x.key || value != x.value); }
 
 //............class block..............
 template<class NodeType>
@@ -198,6 +171,11 @@ void Block<NodeType>::Find(const std::string &key_, std::vector<int> &find_list)
   }
 }
 template<class NodeType>
+NodeType &Block<NodeType>::operator[](const int &index_) {
+  return array[index_];
+}
+
+template<class NodeType>
 BlockInfo<NodeType>::BlockInfo(const Block<NodeType> &x, int position_) {
   tail = x.End();
   position = position_;
@@ -241,10 +219,6 @@ int BlockGallery<NodeType>::FindPosition(const NodeType &x) const {
   pos = static_cast<int>(std::lower_bound(arr, arr + block_num - 1, x) - arr);
   return pos;
 }
-
-
-
-
 
 //.......ULL...........
 template<class NodeType>
@@ -361,6 +335,20 @@ bool UnrolledLinkedList<NodeType>::Query(const string &key_, std::vector<int> &f
     this_block.Find(key_, find_list_);
   }
   return find_list_.empty();
+}
+
+template<class NodeType>
+void UnrolledLinkedList<NodeType>::GetAll(std::vector<NodeType> &find_list_){
+  int lp, rp;
+  rp = block_info.block_num - 1;
+  lp = 0;
+  Block<NodeType> this_block;
+  for (int i = lp; i < rp + 1; i++) {
+    block_list.Read(this_block, block_info.arr[i].position);
+    for(int j=0;j<this_block.Size();++j){
+      find_list_.push_back(this_block[j]);
+    }
+  }
 }
 
 #endif //PARSER_CPP__ULL_NEW_HPP_
