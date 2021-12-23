@@ -30,7 +30,7 @@ class User {
  public:
   Char<KEY_SIZE> user_ID;
   Char<KEY_SIZE> user_name;
-  int priority;  // 权限，可以取 7 或 3 或 1
+  int priority=0;  // 权限，可以取 7 或 3 或 1
   User() = default;
   User(const string &user_id,
        const string &password,
@@ -48,7 +48,7 @@ class UserManager {
   void Login(const string &user_id, const string &password_ = "");  // 登录用户
   void Logout();  // 退出登录
   void ChangePassword(const string &user_id, const string &new_password, const string &old_password = "");  // 修改密码
-  void CreateUser(const string &user_id, const string &password, const int priority, const string &user_name);  // 创建用户
+  void CreateUser(const string &user_id, const string &password, const int &priority, const string &user_name);  // 创建用户
   void Register(const string &user_id, const string &password, const string &user_name);  // 注册账户
   void Remove(const string &user_id);  // 删除账户
 

@@ -11,14 +11,12 @@ BookManager::BookManager(const string &book_info_,
                          const string &by_ISBN_,
                          const string &by_name_,
                          const string &by_author_,
-                         const string &by_keyword_,
-                         UserManager &user_manager)
+                         const string &by_keyword_)
     : book_info(book_info_),
       data_rank_by_ISBN(by_ISBN_),
       data_rank_by_name(by_name_),
       data_rank_by_author(by_author_),
-      data_rank_by_keyword(by_keyword_),
-      user_manager_(user_manager) {}
+      data_rank_by_keyword(by_keyword_) {}
 
 bool BookManager::cmp(const Book &a, const Book &b) {
   return a.ISBN < b.ISBN;
@@ -26,7 +24,6 @@ bool BookManager::cmp(const Book &a, const Book &b) {
 
 void BookManager::ShowBook(BookManager::ParaType para_type, const string &arg) {
   std::vector<Book> target_book;
-  if (!CheckPriority(1))throw Error("PermissionError");
   switch (para_type) {
     case ISBN:GetTargetBook(data_rank_by_ISBN, target_book, arg);
       break;
@@ -39,9 +36,9 @@ void BookManager::ShowBook(BookManager::ParaType para_type, const string &arg) {
     case ALL:std::vector<Node> target_index;
       data_rank_by_ISBN.GetAll(target_index);
       Book carrier;
-      for (auto & i : target_index) {
-       book_info.Read(carrier,i.value);
-       target_book.push_back(carrier);
+      for (auto &i: target_index) {
+        book_info.Read(carrier, i.value);
+        target_book.push_back(carrier);
       }
       break;
   }
@@ -52,8 +49,7 @@ void BookManager::ShowBook(BookManager::ParaType para_type, const string &arg) {
   }
 }
 
-void BookManager::BuyBook(const string &ISBN_, int quantity_) {
-  if (!CheckPriority(1))throw Error("PermissionError");
+void BookManager::BuyBook(const string &ISBN_, int quantity_, Logger &logger_) {
   std::vector<int> target_index;
   data_rank_by_ISBN.Query(ISBN_, target_index);
   if (target_index.empty())throw Error("NoBookMatched");
@@ -62,12 +58,13 @@ void BookManager::BuyBook(const string &ISBN_, int quantity_) {
   if (carrier.quantity < quantity_)throw Error("NoBookMatched");
   carrier.quantity -= quantity_;
   double cost = quantity_ * carrier.price;
-  cout << cost << endl;
+  logger_.WriteFinance(cost);
+  cout << std::fixed << std::setprecision(2) << cost << endl;
   book_info.Update(carrier, target_index[0]);
+
 }
 
-void BookManager::SelectBook(const string &ISBN_) {
-  if (!CheckPriority(3))throw Error("PermissionError");
+void BookManager::SelectBook(const string &ISBN_, UserManager &user_manager_) {
   std::vector<int> target_index;
   data_rank_by_ISBN.Query(ISBN_, target_index);
   int index;
@@ -82,28 +79,28 @@ void BookManager::SelectBook(const string &ISBN_) {
 //  cout<<test<<endl;
   user_manager_.ChangeNowIndex(index);
 }
-void BookManager::ModifyBook(const unordered_map<string, string> &cmd) {
-  if (!CheckPriority(3))throw Error("PermissionError");
+void BookManager::ModifyBook(const unordered_map<string, string> &cmd, UserManager &user_manager_) {
   if (!user_manager_.GetNowIndex())throw Error("NoBookSelected");
   for (const auto &i: cmd) {
-    if (i.first == "ISBN")ModifyIsbn(i.second);
-    else if (i.first == "name")ModifyName(i.second);
-    else if (i.first == "author")ModifyAuthor(i.second);
-    else if (i.first == "keyword")ModifyKeywords(i.second);
-    else if (i.first == "price")ModifyPrice(i.second);
+    if (i.first == "ISBN")ModifyIsbn(i.second, user_manager_);
+    else if (i.first == "name")ModifyName(i.second, user_manager_);
+    else if (i.first == "author")ModifyAuthor(i.second, user_manager_);
+    else if (i.first == "keyword")ModifyKeywords(i.second, user_manager_);
+    else if (i.first == "price")ModifyPrice(i.second, user_manager_);
   }
 }
 
-void BookManager::ImportBook(int quantity, double total_cost) {
-  if (!CheckPriority(3))throw Error("PermissionError");
+void BookManager::ImportBook(int quantity, double total_cost, UserManager &user_manager_, Logger &logger_) {
   int index = user_manager_.GetNowIndex();
+  if(!index)throw Error("NoBookSelected");
   Book now_book;
   book_info.Read(now_book, index);
   now_book.quantity += quantity;
   book_info.Update(now_book, index);
+  logger_.WriteFinance(-total_cost);
 }
 
-void BookManager::ModifyIsbn(const string &isbn_) {
+void BookManager::ModifyIsbn(const string &isbn_, UserManager &user_manager_) {
   if (CheckExist(isbn_))throw Error("ISBNExist");
   int index = user_manager_.GetNowIndex();
   Book now_book;
@@ -115,7 +112,7 @@ void BookManager::ModifyIsbn(const string &isbn_) {
   data_rank_by_ISBN.Del(old_node);
   data_rank_by_ISBN.Add(new_node);
 }
-void BookManager::ModifyName(const string &name_) {
+void BookManager::ModifyName(const string &name_, UserManager &user_manager_) {
   int index = user_manager_.GetNowIndex();
   Book now_book;
   book_info.Read(now_book, index);
@@ -126,7 +123,7 @@ void BookManager::ModifyName(const string &name_) {
   data_rank_by_name.Del(old_node);
   data_rank_by_name.Add(new_node);
 }
-void BookManager::ModifyAuthor(const string &author_) {
+void BookManager::ModifyAuthor(const string &author_, UserManager &user_manager_) {
   int index = user_manager_.GetNowIndex();
   Book now_book;
   book_info.Read(now_book, index);
@@ -137,7 +134,7 @@ void BookManager::ModifyAuthor(const string &author_) {
   data_rank_by_author.Del(old_node);
   data_rank_by_author.Add(new_node);
 }
-void BookManager::ModifyKeywords(const string &keywords_) {
+void BookManager::ModifyKeywords(const string &keywords_, UserManager &user_manager_) {
   int index = user_manager_.GetNowIndex();
   Book now_book;
   book_info.Read(now_book, index);
@@ -159,7 +156,7 @@ void BookManager::ModifyKeywords(const string &keywords_) {
     data_rank_by_keyword.Add(carrier);
   }
 }
-void BookManager::ModifyPrice(const string &price_) {
+void BookManager::ModifyPrice(const string &price_, UserManager &user_manager_) {
   double price = std::stod(price_);
   int index = user_manager_.GetNowIndex();
   Book now_book;
@@ -193,10 +190,7 @@ void BookManager::GetTargetBook(UnrolledLinkedList<Node> &file, std::vector<Book
     ++i;
   }
 }
-bool BookManager::CheckPriority(const int &low) {
-  if (user_manager_.GetNowPriority() < low)return false;
-  return true;
-}
+
 void BookManager::BookNumAdd(const int &x) {
   book_info.GetInfo(book_num);
   book_num += x;

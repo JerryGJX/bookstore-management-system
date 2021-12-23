@@ -12,7 +12,7 @@
 template<int maxLength = 65>
 struct Char {
   // +1 是因为要存结尾 '\0'
-  char content[maxLength]{};
+  char content[maxLength+1]{};
   // 默认为空字符串
   Char() = default;
 

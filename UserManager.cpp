@@ -70,7 +70,7 @@ void UserManager::ChangePassword(const string &user_id, const string &new_passwo
 
 void UserManager::CreateUser(const string &user_id,
                              const string &password,
-                             const int priority,
+                             const int &priority,
                              const string &user_name) {
   int index;
   if (priority >= GetNowPriority() || GetNowPriority() < STAFFPRIORITY)throw Error("PermissionError");

@@ -18,4 +18,16 @@ struct Node {
   bool operator==(const Node &) const;
   bool operator!=(const Node &) const;
 };
+
+struct NodeDigit {
+  int value = 0;
+  int key = 0;
+  NodeDigit() = default;
+  NodeDigit(const int &key_, const int &value_);
+  NodeDigit(const NodeDigit &);
+  bool operator<(const NodeDigit &) const;
+  bool operator==(const NodeDigit &) const;
+  bool operator!=(const NodeDigit &) const;
+};
+
 #endif //MAIN_CPP__NODE_HPP_

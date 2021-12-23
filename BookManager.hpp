@@ -13,6 +13,7 @@
 #include "Node.hpp"
 #include "Error.hpp"
 #include "UserManager.hpp"
+#include "Logger.hpp"
 
 using std::string;
 using std::unordered_map;
@@ -20,7 +21,7 @@ using std::unordered_map;
 const int MaxOfIsbn = 20, MaxOfKeyword = 60, MaxOfName = 60, MaxOfAuthor = 60;
 
 class Book;
-
+class Logger;
 class BookManager {
  private:
   MemoryRiver<Book, int, sizeof(int)> book_info;
@@ -29,24 +30,26 @@ class BookManager {
   UnrolledLinkedList<Node> data_rank_by_author;
   UnrolledLinkedList<Node> data_rank_by_keyword;
   int book_num = 0;
-  UserManager &user_manager_;
+  //UserManager &user_manager_;
+
+
+
  public:
   enum ParaType { ISBN, NAME, AUTHOR, KEYWORD, ALL };  // 参数类型
   BookManager(const string &book_info_,
               const string &by_ISBN_,
               const string &by_name_,
               const string &by_author_,
-              const string &by_keyword_,
-              UserManager &user_manager);
+              const string &by_keyword_);
 
-  static bool cmp(const Book& a, const Book& b);
+  static bool cmp(const Book &a, const Book &b);
 
   void ShowBook(ParaType para_type, const string &arg = "");  // 检索图书
-  void BuyBook(const string &ISBN, int quantity);  // 购买图书
-  void SelectBook(const string &ISBN);  // 以当前账户选中指定图书
-  void ModifyBook(const unordered_map<string, string> &cmd);  // 更新选中图书的信息
+  void BuyBook(const string &ISBN, int quantity, Logger &logger_);  // 购买图书
+  void SelectBook(const string &ISBN, UserManager &user_manager_);  // 以当前账户选中指定图书
+  void ModifyBook(const unordered_map<string, string> &cmd, UserManager &user_manager_);  // 更新选中图书的信息
   //void ModifyBook(ParaType para_type, int price);  // 更新选中图书的信息
-  void ImportBook(int quantity, double total_cost);  // 指定交易总额购入指定数量的选中图书
+  void ImportBook(int quantity, double total_cost, UserManager &user_manager_, Logger &logger_);  // 指定交易总额购入指定数量的选中图书
 
   static void SplitString(const string &cmd, std::vector<string> &x, const char &flag);
 
@@ -54,23 +57,19 @@ class BookManager {
 
   void GetTargetBook(UnrolledLinkedList<Node> &file, std::vector<Book> &, const string &arg);
 
-  bool CheckPriority(const int &);
-
   void BookNumAdd(const int &);
 
-  void ModifyIsbn(const string &);
+  void ModifyIsbn(const string &, UserManager &user_manager_);
 
-  void ModifyName(const string &);
+  void ModifyName(const string &, UserManager &user_manager_);
 
-  void ModifyAuthor(const string &);
+  void ModifyAuthor(const string &, UserManager &user_manager_);
 
-  void ModifyKeywords(const string &);
+  void ModifyKeywords(const string &, UserManager &user_manager_);
 
-  void ModifyPrice(const string &);
+  void ModifyPrice(const string &, UserManager &user_manager_);
 
 };
-
-
 
 class Book {
   friend std::ostream &operator<<(std::ostream &, const Book &);

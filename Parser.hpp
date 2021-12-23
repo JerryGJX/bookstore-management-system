@@ -88,6 +88,8 @@ class CommandParser {
 
   static bool TimeCheck(const string &Time_);
 
+  bool CheckPriority(const int &);
+
 };
 
 #endif //UNTITLED1_PARSER_HPP

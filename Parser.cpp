@@ -25,7 +25,7 @@ void CommandParser::Run() {
         while (!iss.eof()) {
           string carrier;
           iss >> carrier;
-          split_parser.push_back(carrier);
+          if (!carrier.empty()) split_parser.push_back(carrier);
         }
         (this->*mapFunction[first])(split_parser);
       } else throw Error("SyntaxError");
@@ -53,6 +53,8 @@ CommandParser::CommandParser(UserManager &user_manager_, BookManager &book_manag
 }
 
 void CommandParser::ParseSu(vector<string> &cmd) {
+  if (!CheckPriority(0))throw Error("PermissionError");
+
   if (cmd.size() != 1 && cmd.size() != 2) throw Error("SyntaxError");
   if (cmd.size() == 1) {
     if (IdCheck(cmd[0]))user_manager.Login(cmd[0]);
@@ -64,17 +66,23 @@ void CommandParser::ParseSu(vector<string> &cmd) {
 }
 
 void CommandParser::ParseLogout(vector<string> &cmd) {
+  if (!CheckPriority(1))throw Error("PermissionError");
+
   if (!cmd.empty())throw Error("SyntaxError");
   user_manager.Logout();
 }
 
 void CommandParser::ParseRegister(vector<string> &cmd) {
+  if (!CheckPriority(0))throw Error("PermissionError");
+
   if (cmd.size() != 3)throw Error("SyntaxError");
   if (IdCheck(cmd[0]) && PasswordCheck(cmd[1]) && UserNameCheck(cmd[2]))user_manager.Register(cmd[0], cmd[1], cmd[2]);
   else throw Error("SyntaxError");
 }
 
 void CommandParser::ParsePasswd(vector<string> &cmd) {//先new后old
+  if (!CheckPriority(1))throw Error("PermissionError");
+
   if (cmd.size() == 3 && IdCheck(cmd[0]) && PasswordCheck(cmd[1]) && PasswordCheck(cmd[2]))
     user_manager.ChangePassword(cmd[0], cmd[2], cmd[1]);
   else if (cmd.size() == 2 && IdCheck(cmd[0]) && PasswordCheck(cmd[1]))user_manager.ChangePassword(cmd[0], cmd[1]);
@@ -82,6 +90,8 @@ void CommandParser::ParsePasswd(vector<string> &cmd) {//先new后old
 }
 
 void CommandParser::ParseUseradd(vector<string> &cmd) {
+  if (!CheckPriority(3))throw Error("PermissionError");
+
   if (cmd.size() != 4) throw Error("SyntaxError");
   if (IdCheck(cmd[0]) && PasswordCheck(cmd[1]) && PriorityCheck(cmd[2]) && UserNameCheck(cmd[3])) {
     int int_temp = std::stoi(cmd[2]);
@@ -90,6 +100,8 @@ void CommandParser::ParseUseradd(vector<string> &cmd) {
 }
 
 void CommandParser::ParseDelete(vector<string> &cmd) {
+  if (!CheckPriority(7))throw Error("PermissionError");
+
   if (cmd.size() != 1)throw Error("SyntaxError");
   if (IdCheck(cmd[0]))user_manager.Remove(cmd[0]);
   else throw Error("SyntaxError");
@@ -101,6 +113,8 @@ void CommandParser::ParseShow(vector<string> &cmd) {
 }
 
 void CommandParser::ParseShowBook(vector<string> &cmd) {
+  if (!CheckPriority(1))throw Error("PermissionError");
+
   if (cmd.empty())book_manager.ShowBook(BookManager::ALL);
   else if (cmd.size() == 1) {
     string type_carrier = GetType(cmd[0], 20, 3);
@@ -113,7 +127,7 @@ void CommandParser::ParseShowBook(vector<string> &cmd) {
     } else if (type_carrier == "author") {
       if (AuthorCheck(content))book_manager.ShowBook(BookManager::AUTHOR, content); else throw Error("SyntaxError");
     } else if (type_carrier == "keyword") {
-      if (KeywordCheck(content) && !count(content.begin(),content.end(),'|')) {
+      if (KeywordCheck(content) && !count(content.begin(), content.end(), '|')) {
         book_manager.ShowBook(BookManager::KEYWORD, content);
       } else throw Error("SyntaxError");
     } else throw Error("SyntaxError");
@@ -121,20 +135,26 @@ void CommandParser::ParseShowBook(vector<string> &cmd) {
 }
 
 void CommandParser::ParseBuy(vector<string> &cmd) {
+  if (!CheckPriority(1))throw Error("PermissionError");
+
   if (cmd.size() != 2) throw Error("SyntaxError");
   if (IsbnCheck(cmd[0]) && QuantityCheck(cmd[1])) {
     int int_temp = std::stoi(cmd[1]);
-    book_manager.BuyBook(cmd[0], int_temp);
+    book_manager.BuyBook(cmd[0], int_temp, logger);
   } else throw Error("SyntaxError");
 }
 
 void CommandParser::ParseSelect(vector<string> &cmd) {
+  if (!CheckPriority(3))throw Error("PermissionError");
+
   if (cmd.size() != 1) throw Error("SyntaxError");
-  if (IsbnCheck(cmd[0]))book_manager.SelectBook(cmd[0]);
+  if (IsbnCheck(cmd[0]))book_manager.SelectBook(cmd[0], user_manager);
   else throw Error("SyntaxError");
 }
 
 void CommandParser::ParseModify(vector<string> &cmd) {
+  if (!CheckPriority(3))throw Error("PermissionError");
+
   if (cmd.size() > 5)throw Error("SyntaxError");
   int num = static_cast<int>(cmd.size());
   std::unordered_map<string, string> info_to_change;
@@ -167,19 +187,23 @@ void CommandParser::ParseModify(vector<string> &cmd) {
       } else throw Error("SyntaxError");
     } else throw Error("SyntaxError");
   }
-  book_manager.ModifyBook(info_to_change);
+  book_manager.ModifyBook(info_to_change, user_manager);
 }
 
 void CommandParser::ParseImport(vector<string> &cmd) {
+  if (!CheckPriority(3))throw Error("PermissionError");
+
   if (cmd.size() != 2)throw Error("SyntaxError");
   if (QuantityCheck(cmd[0]) && TotalCostCheck(cmd[1])) {
     int quantity_ = std::stoi(cmd[0]);
     double total_cost_ = std::stod(cmd[1]);
-    book_manager.ImportBook(quantity_, total_cost_);
+    book_manager.ImportBook(quantity_, total_cost_, user_manager, logger);
   } else throw Error("SyntaxError");
 }
 
 void CommandParser::ParseReport(vector<string> &cmd) {
+  if (!CheckPriority(7))throw Error("PermissionError");
+
   if (cmd.size() != 1)throw Error("SyntaxError");
   if (cmd[0] == "myself")logger.ReportMyself();
   else if (cmd[0] == "finance")logger.ReportFinance();
@@ -188,14 +212,18 @@ void CommandParser::ParseReport(vector<string> &cmd) {
 }
 
 void CommandParser::ParseShowFinance(vector<string> &cmd) {
-  if (cmd.empty())logger.ShowFinance();
-  else if (cmd.size() == 1 && TimeCheck(cmd[0])) {
-    int carrier = std::stoi(cmd[0]);
+  if (!CheckPriority(7))throw Error("PermissionError");
+
+  if (cmd.size() == 1)logger.ShowFinance();
+  else if (cmd.size() == 2 && TimeCheck(cmd[1])) {
+    int carrier = std::stoi(cmd[1]);
     logger.ShowFinance(carrier);
   } else throw Error("SyntaxError");
 }
 
 void CommandParser::ParseLog(vector<string> &cmd) {
+  if (!CheckPriority(7))throw Error("PermissionError");
+
   if (cmd.empty())logger.ShowLog();
   else throw Error("SyntaxError");
 }
@@ -308,5 +336,10 @@ bool CommandParser::TimeCheck(const string &time_) {
   for (char A: time_) { if (A < '0' || A > '9')return false; }
   long long int_temp = std::stol(time_);
   if (int_temp > quantity_max)return false;
+  return true;
+}
+
+bool CommandParser::CheckPriority(const int &low) {
+  if (user_manager.GetNowPriority() < low)return false;
   return true;
 }
