@@ -45,9 +45,10 @@ void UserManager::Login(const string &user_id, const string &password_) {
   int index;
   if (!FindId(user_id, index))throw Error("UserNotExist");
   User to_log_user;
+  //to_log_user.password="";
   user_database.Read(to_log_user, index);
   if ((!password_.empty()) && (to_log_user.password != password_))throw Error("IncorrectPassword");//检测密码
-  if (password_.empty() && to_log_user.priority < GetNowPriority())throw Error("IncorrectPassword");
+  if (password_.empty() && to_log_user.priority > GetNowPriority())throw Error("IncorrectPassword");
   std::pair<User, int> carrier(to_log_user, NULL);
   //bool flag = false;
   for (auto &i: user_stack) {
