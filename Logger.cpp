@@ -48,24 +48,24 @@ Logger::Logger(const string &finance_list_, const string &finance_data_,
     : finance_list(finance_list_), finance_data(finance_data_), log_data(log_data_) {}
 
 void Logger::ShowFinance(int time) {
-//  if (!time)cout << endl;
-//  else {
-//    finance_data.GetInfo(finance_num);
-//    if (time > finance_num)throw Error("EntryNumExceeded");
-//    int num;
-//    num = (time == -1) ? finance_num : time;
-//    Finance carrier;
-//    std::vector<NodeDigit> target_index;
-//    finance_list.GetAll(target_index);
-//    int target_size = static_cast<int>(target_index.size());
-//    Finance answer;
-//    for (int i = 0; i < num; ++i) {
-//      finance_data.Read(carrier, target_index[target_size - i - 1].value);
-//      answer += carrier;
-//    }
-//    cout << answer << endl;
-//  }
-cout<<"ShowFinance"<<endl;
+  if (!time)cout << endl;
+  else {
+    finance_data.GetInfo(finance_num);
+    if (time > finance_num)throw Error("EntryNumExceeded");
+    int num;
+    num = (time == -1) ? finance_num : time;
+    Finance carrier;
+    std::vector<NodeDigit> target_index;
+    finance_list.GetAll(target_index);
+    int target_size = static_cast<int>(target_index.size());
+    Finance answer;
+    for (int i = 0; i < num; ++i) {
+      finance_data.Read(carrier, target_index[target_size - i - 1].value);
+      answer += carrier;
+    }
+    cout << answer << endl;
+  }
+//cout<<"ShowFinance"<<endl;
 }
 
 void Logger::WriteFinance(const double &digit) {
