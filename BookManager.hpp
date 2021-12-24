@@ -15,6 +15,8 @@
 #include "UserManager.hpp"
 #include "Logger.hpp"
 
+#define QUANTITYMAX 2147483647
+
 using std::string;
 using std::unordered_map;
 
@@ -78,7 +80,7 @@ class Book {
   Char<MaxOfName> name;
   Char<MaxOfAuthor> author;
   Char<MaxOfKeyword> keyword;
-  int quantity = 0;
+  double quantity = 0;
   double price = 0;
   Book() = default;
   Book(const Book &);
