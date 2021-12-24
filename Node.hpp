@@ -5,6 +5,7 @@
 #ifndef MAIN_CPP__NODE_HPP_
 #define MAIN_CPP__NODE_HPP_
 
+#include <ostream>
 #include "Char.hpp"
 #define KEY_SIZE 65
 
@@ -28,6 +29,23 @@ struct NodeDigit {
   bool operator<(const NodeDigit &) const;
   bool operator==(const NodeDigit &) const;
   bool operator!=(const NodeDigit &) const;
+};
+
+struct IntWrapper {
+  int a = 0;
+  IntWrapper() = default;
+  IntWrapper(const int &);
+  IntWrapper(IntWrapper &x);
+  operator int() const { return a; };
+  bool operator==(const IntWrapper &rhs) const;
+  bool operator!=(const IntWrapper &rhs) const;
+  IntWrapper &operator=(const IntWrapper &rhs);
+  friend std::ostream &operator<<(std::ostream &os, const IntWrapper &wrapper);
+  bool operator<(const IntWrapper &rhs) const;
+  bool operator>(const IntWrapper &rhs) const;
+  bool operator<=(const IntWrapper &rhs) const;
+  bool operator>=(const IntWrapper &rhs) const;
+  IntWrapper operator++(int);
 };
 
 #endif //MAIN_CPP__NODE_HPP_

@@ -214,7 +214,7 @@ void CommandParser::ParseReport(vector<string> &cmd) {
 void CommandParser::ParseShowFinance(vector<string> &cmd) {
   if (!CheckPriority(7))throw Error("PermissionError");
 
-  if (cmd.size() == 1)logger.ShowFinance();
+  if (cmd.size() == 1)logger.ShowFinance(-1);
   else if (cmd.size() == 2 && TimeCheck(cmd[1])) {
     int carrier = std::stoi(cmd[1]);
     logger.ShowFinance(carrier);

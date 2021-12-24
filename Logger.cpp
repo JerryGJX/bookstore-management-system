@@ -51,9 +51,15 @@ void Logger::ShowFinance(int time) {
   if (!time)cout << endl;
   else {
     finance_data.GetInfo(finance_num);
+    //cout<<"finance_num= "<<finance_num<<endl;
     if (time > finance_num)throw Error("EntryNumExceeded");
     int num;
-    num = (time == -1) ? finance_num : time;
+    num = (time == -1) ? static_cast<int>(finance_num) : time;
+//    if(time==-1){
+//      cout<<num<<endl;
+//      cout<<"#-1"<<endl;
+//      throw Error("#-1");
+//    }
     Finance carrier;
     std::vector<NodeDigit> target_index;
     finance_list.GetAll(target_index);

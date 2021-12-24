@@ -33,14 +33,15 @@ class MemoryRiver {
   MemoryRiver(const string &file_name) : file_name(file_name) {
 //        file.open(file_name);
 //#ifdef MyDebug
-//        std::filesystem::remove(file_name);
-//        std::cout << file_name << " deleted" << std::endl;
+    std::filesystem::remove(file_name);
+    std::cout << file_name << " deleted" << std::endl;
 //#endif
     if (!std::filesystem::exists(file_name)) {
 //            file.clear();
       file.open(file_name, std::ios::out);
       file.seekp(0, std::ios::beg);
       InfoType info;
+
       file.write(reinterpret_cast<char *>(&info), InfoLength);
       file.seekp(InfoLength, std::ios::beg);
       file.write(reinterpret_cast<char *>(&free_head), sizeof(int));

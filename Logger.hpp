@@ -31,11 +31,13 @@ class Log {
   friend std::ostream &operator<<(std::ostream &, const Log &);
 };
 
+
+
 class Logger {
-  MemoryRiver<Finance, int, sizeof(int)> finance_data;
+  MemoryRiver<Finance, IntWrapper, sizeof(int)> finance_data;
   UnrolledLinkedList<NodeDigit> finance_list;
   MemoryRiver<Node, int, 4> log_data;
-  int finance_num = 0, log_num = 0;
+  IntWrapper finance_num = 0, log_num = 0;
  public:
   Logger(const string &finance_list_, const string &finance_data_,
          const string &log_data_);
