@@ -30,7 +30,7 @@ void CommandParser::Run() {
         (this->*mapFunction[first])(split_parser);
       } else throw Error("SyntaxError");
     }
-  }else exit(0);
+  } else exit(0);
 }
 
 CommandParser::CommandParser(UserManager &user_manager_, BookManager &book_manager_, Logger &logger_) : user_manager(
@@ -278,14 +278,20 @@ bool CommandParser::KeywordRepeatCheck(const string &keyword_, const char &flag)
   string carrier;
   for (int i = 0; i < size; ++i) {
     l = (!l) ? r : r + 1;
-    if (keyword_[i] == flag || i == size) {
+    if (keyword_[i] == flag) {
       r = i;
-      carrier = keyword_.substr(l, r - l - 1);
+      carrier = keyword_.substr(l, r - l);
       if (x.find(carrier) == x.end())x.insert(carrier);
       else return false;
+      //cout << carrier << endl;
+    } else if (i == size - 1) {
+      r = i;
+      carrier = keyword_.substr(l, r - l + 1);
+      if (x.find(carrier) == x.end())x.insert(carrier);
+      else return false;
+      //cout << carrier << endl;
     }
   }
-  return true;
 }
 
 bool CommandParser::QuantityCheck(const string &quantity_) {
