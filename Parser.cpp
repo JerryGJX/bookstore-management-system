@@ -292,6 +292,7 @@ bool CommandParser::KeywordRepeatCheck(const string &keyword_, const char &flag)
       //cout << carrier << endl;
     }
   }
+  return true;
 }
 
 bool CommandParser::QuantityCheck(const string &quantity_) {
