@@ -49,12 +49,21 @@ void UserManager::Login(const string &user_id, const string &password_) {
   if ((!password_.empty()) && (to_log_user.password != password_))throw Error("IncorrectPassword");//检测密码
   if (password_.empty() && to_log_user.priority < GetNowPriority())throw Error("IncorrectPassword");
   std::pair<User, int> carrier(to_log_user, NULL);
-  user_stack.push_back(carrier);
+  //bool flag = false;
+  for (auto &i: user_stack) {
+    if (i.first.user_ID == user_id) {
+      //flag = true;
+      carrier.second=i.second;
+    }
+  }
+    user_stack.push_back(carrier);
+    //log_flag = true;
 }
 
 void UserManager::Logout() {
   if (user_stack.empty())throw Error("NoUser");
   user_stack.pop_back();
+  //log_flag = false;
 }
 
 void UserManager::ChangePassword(const string &user_id, const string &new_password, const string &old_password) {

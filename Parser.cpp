@@ -21,6 +21,7 @@ void CommandParser::Run() {
       exit(0);
     } else {
       if (mapFunction.find(first) != mapFunction.end()) {
+       // PrintAll();
         vector<string> split_parser;
         while (!iss.eof()) {
           string carrier;
@@ -349,4 +350,21 @@ bool CommandParser::TimeCheck(const string &time_) {
 bool CommandParser::CheckPriority(const int &low) {
   if (user_manager.GetNowPriority() < low)return false;
   return true;
+}
+
+
+void CommandParser::PrintAll() {
+  std::vector<Book> target_book;
+  std::vector<Node> target_index;
+  book_manager.data_rank_by_ISBN.GetAll(target_index);
+  Book carrier;
+  for (auto &i: target_index) {
+    book_manager.book_info.Read(carrier, i.value);
+    target_book.push_back(carrier);
+  }
+  if (target_book.empty())cout << endl;
+  else {
+    std::sort(target_book.begin(), target_book.end(), BookManager::cmp);
+    for (auto &i: target_book) cout << i << endl;
+  }
 }

@@ -12,9 +12,9 @@
 #include "Char.hpp"
 #include "MemoryRiver.hpp"
 
-#define BLOCK_SIZE 318
-#define BLOCK_SPLIT_LIMIT 314
-#define BLOCK_SPLIT_LEFT 157
+#define BLOCK_SIZE 600
+#define BLOCK_SPLIT_LIMIT 550
+#define BLOCK_SPLIT_LEFT 300
 #define BLOCK_MERGE_LIMIT 157
 #define KEY_SIZE 65
 #define BLOCK_NUM_LIMIT 317

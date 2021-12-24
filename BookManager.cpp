@@ -55,7 +55,7 @@ void BookManager::BuyBook(const string &ISBN_, int quantity_, Logger &logger_) {
   if (target_index.empty())throw Error("NoBookMatched");
   Book carrier;
   book_info.Read(carrier, target_index[0]);
-  if (carrier.quantity < quantity_)throw Error("NoBookMatched");
+  if (carrier.quantity < quantity_)throw Error("NoBookLeft");
   carrier.quantity -= quantity_;
   double cost = quantity_ * carrier.price;
   logger_.WriteFinance(cost);

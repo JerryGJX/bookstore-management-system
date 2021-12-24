@@ -30,7 +30,7 @@ class User {
  public:
   Char<KEY_SIZE> user_ID;
   Char<KEY_SIZE> user_name;
-  int priority=0;  // 权限，可以取 7 或 3 或 1
+  int priority = 0;  // 权限，可以取 7 或 3 或 1
   User() = default;
   User(const string &user_id,
        const string &password,
@@ -41,8 +41,9 @@ class User {
 class UserManager {
  private:
   UnrolledLinkedList<Node> user_data_list;//id to position in memory_river
-  MemoryRiver<User,int,0> user_database;
+  MemoryRiver<User, int, 0> user_database;
   std::vector<std::pair<User, int>> user_stack;  // 用户栈，储存登录的用户和他所选的图书的 offset
+  //bool log_flag = false;
  public:
   UserManager(const string &user_data_list_, const string &user_database_);
   void Login(const string &user_id, const string &password_ = "");  // 登录用户

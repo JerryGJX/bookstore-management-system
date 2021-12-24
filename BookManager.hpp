@@ -25,7 +25,7 @@ const int MaxOfIsbn = 20, MaxOfKeyword = 60, MaxOfName = 60, MaxOfAuthor = 60;
 class Book;
 class Logger;
 class BookManager {
- private:
+ public:
   MemoryRiver<Book, int, sizeof(int)> book_info;
   UnrolledLinkedList<Node> data_rank_by_ISBN;
   UnrolledLinkedList<Node> data_rank_by_name;

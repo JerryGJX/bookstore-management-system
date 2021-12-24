@@ -90,6 +90,9 @@ class CommandParser {
 
   bool CheckPriority(const int &);
 
+
+
+  void PrintAll();
 };
 
 #endif //UNTITLED1_PARSER_HPP
