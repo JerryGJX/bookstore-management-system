@@ -9,10 +9,10 @@
 //Logger &logger;
 
 void CommandParser::Run() {
-  while (true) {
-    std::string parser_carrier;
-    std::getline(std::cin, parser_carrier);
+  std::string parser_carrier;
+  while (std::getline(std::cin, parser_carrier)) {
     std::istringstream iss(parser_carrier);
+    //if (iss.eof())exit(0);
     std::string first;
     iss >> first;
     if (first == "exit" || first == "quit") {
@@ -30,7 +30,7 @@ void CommandParser::Run() {
         (this->*mapFunction[first])(split_parser);
       } else throw Error("SyntaxError");
     }
-  }
+  }exit(0);
 }
 
 CommandParser::CommandParser(UserManager &user_manager_, BookManager &book_manager_, Logger &logger_) : user_manager(
