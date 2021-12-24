@@ -92,7 +92,7 @@ void BookManager::ModifyBook(const unordered_map<string, string> &cmd, UserManag
 
 void BookManager::ImportBook(int quantity, double total_cost, UserManager &user_manager_, Logger &logger_) {
   int index = user_manager_.GetNowIndex();
-  if(!index)throw Error("NoBookSelected");
+  if (!index)throw Error("NoBookSelected");
   Book now_book;
   book_info.Read(now_book, index);
   now_book.quantity += quantity;
@@ -171,9 +171,13 @@ void BookManager::SplitString(const string &cmd, std::vector<string> &x, const c
   string carrier;
   for (int i = 0; i < size; ++i) {
     l = (!l) ? r : r + 1;
-    if (cmd[i] == flag || i == size) {
+    if (cmd[i] == flag) {
       r = i;
       carrier = cmd.substr(l, r - l);
+      x.push_back(carrier);
+    } else if (i == size - 1) {
+      r = i;
+      carrier = cmd.substr(l, r - l + 1);
       x.push_back(carrier);
     }
   }
@@ -182,6 +186,17 @@ void BookManager::SplitString(const string &cmd, std::vector<string> &x, const c
 void BookManager::GetTargetBook(UnrolledLinkedList<Node> &file, std::vector<Book> &receiver, const string &arg) {
   std::vector<int> target_location;
   Book carrier;
+
+
+//  std::vector<Node> x;
+//  file.GetAll(x);
+//  for (int i = 0; i < x.size(); ++i) {
+//    book_info.Read(carrier, x[i].value);
+//    cout << carrier << endl;
+//    ++i;
+//  }
+
+
   file.Query(arg, target_location);
   int i = 0;
   while (i < target_location.size()) {

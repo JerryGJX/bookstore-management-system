@@ -5,9 +5,18 @@
 #include "Logger.hpp"
 
 //...........Finance............
+Finance::Finance() {
+  income = 0;
+  expense = 0;
+}
 Finance::Finance(const double &digit) {
-  if (digit > 0)income = digit;
-  else expense = -digit;
+  if (digit > 0) {
+    income = digit;
+    expense = 0;
+  } else {
+    expense = -digit;
+    income = 0;
+  };
 }
 Finance &Finance::operator+=(const Finance &x) {
   income += x.income, expense += x.expense;
@@ -19,6 +28,7 @@ std::ostream &operator<<(std::ostream &os, const Finance &x) {
      << x.expense;
   return os;
 }
+
 
 //.........Log.............
 
@@ -33,28 +43,29 @@ std::ostream &operator<<(std::ostream &os, const Log &x) {
 
 //.........Logger................
 
-Logger::Logger(const string &finance_list_,const string &finance_data_,
+Logger::Logger(const string &finance_list_, const string &finance_data_,
                const string &log_data_)
     : finance_list(finance_list_), finance_data(finance_data_), log_data(log_data_) {}
 
 void Logger::ShowFinance(int time) {
-  if (!time)cout << endl;
-  else {
-    finance_data.GetInfo(finance_num);
-    if (time > finance_num)throw Error("EntryNumExceeded");
-    int num;
-    num = (time == -1) ? finance_num : time;
-    Finance carrier;
-    std::vector<NodeDigit> target_index;
-    finance_list.GetAll(target_index);
-    int target_size=static_cast<int>(target_index.size());
-    Finance answer;
-    for(int i=0;i<num;++i){
-      finance_data.Read(carrier,target_index[target_size-i-1].value);
-      answer+=carrier;
-    }
-    cout<<answer<<endl;
-  }
+//  if (!time)cout << endl;
+//  else {
+//    finance_data.GetInfo(finance_num);
+//    if (time > finance_num)throw Error("EntryNumExceeded");
+//    int num;
+//    num = (time == -1) ? finance_num : time;
+//    Finance carrier;
+//    std::vector<NodeDigit> target_index;
+//    finance_list.GetAll(target_index);
+//    int target_size = static_cast<int>(target_index.size());
+//    Finance answer;
+//    for (int i = 0; i < num; ++i) {
+//      finance_data.Read(carrier, target_index[target_size - i - 1].value);
+//      answer += carrier;
+//    }
+//    cout << answer << endl;
+//  }
+cout<<"ShowFinance"<<endl;
 }
 
 void Logger::WriteFinance(const double &digit) {
@@ -62,8 +73,8 @@ void Logger::WriteFinance(const double &digit) {
   finance_num++;
   finance_data.WriteInfo(finance_num);
   Finance carrier(digit);
-  int index=finance_data.Write(carrier);
-  NodeDigit node_carrier(finance_num,index);
+  int index = finance_data.Write(carrier);
+  NodeDigit node_carrier(std::to_string(finance_num), index);
   finance_list.Add(node_carrier);
 }
 

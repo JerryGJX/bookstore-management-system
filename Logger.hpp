@@ -16,7 +16,7 @@ class Finance {
   double income = 0, expense = 0;
 
  public:
-  Finance() = default;
+  Finance();
   Finance(const double &);
   Finance &operator+=(const Finance &);
   friend std::ostream &operator<<(std::ostream &, const Finance &);
@@ -34,7 +34,7 @@ class Log {
 class Logger {
   MemoryRiver<Finance, int, sizeof(int)> finance_data;
   UnrolledLinkedList<NodeDigit> finance_list;
-  MemoryRiver<Log, int, sizeof(int)> log_data;
+  MemoryRiver<Node, int, 4> log_data;
   int finance_num = 0, log_num = 0;
  public:
   Logger(const string &finance_list_, const string &finance_data_,

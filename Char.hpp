@@ -12,13 +12,21 @@
 template<int maxLength = 65>
 struct Char {
   // +1 是因为要存结尾 '\0'
-  char content[maxLength+1]{};
+  char content[maxLength + 1]{};
   // 默认为空字符串
-  Char() = default;
+  Char() {
+    memset(this->content, '\0', strlen(content) + 1);
+  };
 
-  Char(const std::string &s) { strcpy(content, s.c_str()); };
+  Char(const std::string &s) {
+    memset(this->content, '\0', strlen(content) + 1);
+    strcpy(content, s.c_str());
+  };
 
-  Char(const char *cstr) { strcpy(content, cstr); };
+  Char(const char *cstr) {
+    memset(this->content, '\0', strlen(content) + 1);
+    strcpy(content, cstr);
+  };
 
   operator std::string() const { return str(); };
 

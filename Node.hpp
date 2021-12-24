@@ -21,9 +21,9 @@ struct Node {
 
 struct NodeDigit {
   int value = 0;
-  int key = 0;
+  Char<KEY_SIZE> key;
   NodeDigit() = default;
-  NodeDigit(const int &key_, const int &value_);
+  NodeDigit(const std::string &key_, const int &value_);
   NodeDigit(const NodeDigit &);
   bool operator<(const NodeDigit &) const;
   bool operator==(const NodeDigit &) const;
