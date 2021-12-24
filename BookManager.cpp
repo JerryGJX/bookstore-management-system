@@ -95,6 +95,7 @@ void BookManager::ImportBook(int quantity, double total_cost, UserManager &user_
   if (!index)throw Error("NoBookSelected");
   Book now_book;
   book_info.Read(now_book, index);
+  if (now_book.quantity + quantity > QUANTITYMAX)throw Error("OverFloat");
   now_book.quantity += quantity;
   book_info.Update(now_book, index);
   logger_.WriteFinance(-total_cost);
@@ -220,8 +221,12 @@ bool BookManager::CheckExist(const string &isbn_) {
 //..........Book...........
 std::ostream &operator<<(std::ostream &os, const Book &rhs) {
   os << rhs.ISBN << '\t' << rhs.name << '\t' << rhs.author << '\t'
-     << rhs.keyword << '\t' << std::fixed << std::setprecision(2) << rhs.price
-     << '\t' << rhs.quantity;
+     << rhs.keyword << '\t';
+
+    os << std::fixed << std::setprecision(2) << rhs.price;
+
+  os << '\t' << std::fixed << std::setprecision(0) << rhs.quantity;
+
   return os;
 }
 Book::Book(const string &ISBN_,
