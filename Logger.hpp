@@ -12,7 +12,7 @@
 #define LOGLEN 1024
 
 class Finance {
- private:
+ public:
   double income = 0, expense = 0;
 
  public:

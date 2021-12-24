@@ -65,8 +65,18 @@ void Logger::ShowFinance(int time) {
     finance_list.GetAll(target_index);
     int target_size = static_cast<int>(target_index.size());
     Finance answer;
+
+    //cout<<"target_size= "<<target_size<<endl;
+
+//    for (int i = 0; i < num; ++i) {
+//      cout<<"#number: "<<target_size - i - 1<<"\t"<<"address: "<<target_index[target_size - i - 1].value<<"\t"<<endl;
+//    }
+
     for (int i = 0; i < num; ++i) {
       finance_data.Read(carrier, target_index[target_size - i - 1].value);
+
+      //cout<<"#i= "<<i<<"\t"<<"income= "<<carrier.income<<"\t"<<"expense= "<<carrier.expense<<"\t"<<endl;
+
       answer += carrier;
     }
     cout << answer << endl;

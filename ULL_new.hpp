@@ -339,6 +339,7 @@ bool UnrolledLinkedList<NodeType>::Query(const string &key_, std::vector<int> &f
 
 template<class NodeType>
 void UnrolledLinkedList<NodeType>::GetAll(std::vector<NodeType> &find_list_){
+  GetInfo();
   int lp, rp;
   rp = block_info.block_num - 1;
   lp = 0;
