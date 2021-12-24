@@ -11,6 +11,7 @@
 void CommandParser::Run() {
   std::string parser_carrier;
   if (std::getline(std::cin, parser_carrier)) {
+    if (parser_carrier.size() > 1024)throw Error("LengthExceeded");
     std::istringstream iss(parser_carrier);
     //if (iss.eof())exit(0);
     std::string first;
@@ -21,7 +22,7 @@ void CommandParser::Run() {
       exit(0);
     } else {
       if (mapFunction.find(first) != mapFunction.end()) {
-       // PrintAll();
+        // PrintAll();
         vector<string> split_parser;
         while (!iss.eof()) {
           string carrier;
@@ -232,7 +233,8 @@ void CommandParser::ParseLog(vector<string> &cmd) {
 bool CommandParser::IdCheck(const string &Id_) {
   if (Id_.size() > 30) return false;
   for (char A: Id_) {
-    if (A < '0' || (A > '9' && A < 'A') || (A > 'Z' && A < 'a' && A != '_') || A > 'z')return false;
+    if (std::isalnum(A) || A == '_') continue;
+    else return false;
   }
   return true;
 }
@@ -243,7 +245,7 @@ bool CommandParser::PasswordCheck(const string &password_) {
 
 bool CommandParser::UserNameCheck(const string &UserName_) {
   if (UserName_.size() > 30) return false;
-  for (char A: UserName_) { if (A < 32 || A > 127)return false; }
+  for (char A: UserName_) { if (!std::isprint(A))return false; }
   return true;
 }
 
@@ -254,13 +256,13 @@ bool CommandParser::PriorityCheck(const string &Priority_) {
 
 bool CommandParser::IsbnCheck(const string &ISBN_) {
   if (ISBN_.size() > MaxOfIsbn)return false;
-  for (char A: ISBN_) { if (A < 32 || A > 127)return false; }
+  for (char A: ISBN_) { if (!std::isprint(A))return false; }
   return true;
 }
 
 bool CommandParser::BookNameCheck(const string &BookName_) {
   if (BookName_.size() > MaxOfName)return false;
-  for (char A: BookName_) { if (A < 32 || A > 127 || A == '\"')return false; }
+  for (char A: BookName_) { if (!std::isprint(A) || A == '\"')return false; }
   return true;
 }
 
@@ -298,7 +300,7 @@ bool CommandParser::KeywordRepeatCheck(const string &keyword_, const char &flag)
 
 bool CommandParser::QuantityCheck(const string &quantity_) {
   if (quantity_.size() > 10 || quantity_[0] == '-')return false;
-  for (char A: quantity_) { if (A < '0' || A > '9')return false; }
+  for (char A: quantity_) { if (!std::isdigit(A))return false; }
   long long int_temp = std::stol(quantity_);
   if (int_temp > quantity_max)return false;
   return true;
@@ -306,7 +308,7 @@ bool CommandParser::QuantityCheck(const string &quantity_) {
 
 bool CommandParser::PriceCheck(const string &price_) {
   if (price_.size() > 13)return false;
-  for (char A: price_) { if ((A < '0' || A > '9') && A != '.')return false; }
+  for (char A: price_) { if (!std::isprint(A) && A != '.')return false; }
   return true;
 }
 
@@ -341,7 +343,7 @@ string CommandParser::GetContent(const string &cmd, const int &max_len, const in
 
 bool CommandParser::TimeCheck(const string &time_) {
   if (time_.size() > 10)return false;
-  for (char A: time_) { if (A < '0' || A > '9')return false; }
+  for (char A: time_) { if (!std::isdigit(A))return false; }
   long long int_temp = std::stol(time_);
   if (int_temp > quantity_max)return false;
   return true;
@@ -351,7 +353,6 @@ bool CommandParser::CheckPriority(const int &low) {
   if (user_manager.GetNowPriority() < low)return false;
   return true;
 }
-
 
 void CommandParser::PrintAll() {
   std::vector<Book> target_book;
