@@ -58,6 +58,7 @@ class UserManager {
   string GetNowId();
   int GetNowIndex();
   void ChangeNowIndex(const int &index_);
+  bool LoginFlag(const string&user_id_);
 };
 
 #endif //UNTITLED1_USERMANAGER_HPP

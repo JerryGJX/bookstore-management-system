@@ -33,8 +33,8 @@ class MemoryRiver {
   MemoryRiver(const string &file_name) : file_name(file_name) {
 //        file.open(file_name);
 //#ifdef MyDebug
-//    std::filesystem::remove(file_name);
-//    std::cout << file_name << " deleted" << std::endl;
+    std::filesystem::remove(file_name);
+    std::cout << file_name << " deleted" << std::endl;
 //#endif
     if (!std::filesystem::exists(file_name)) {
 //            file.clear();

@@ -103,7 +103,7 @@ void UserManager::Register(const string &user_id, const string &password, const 
 void UserManager::Remove(const string &user_id) {
   int index;
   if (!FindId(user_id, index))throw Error("UserNotExist");
-  if (GetNowId().empty() || GetNowId() == user_id) throw Error("PermissionError");
+  if (LoginFlag(user_id)) throw Error("PermissionError");
   user_database.Delete(index);
   Node carrier(user_id, index);
   user_data_list.Del(carrier);
@@ -129,6 +129,16 @@ void UserManager::ChangeNowIndex(const int &index_) {
 int UserManager::GetNowIndex() {
   if (user_stack.empty())return 0;
   return user_stack.back().second;
+}
+bool UserManager::LoginFlag(const string &user_id_) {
+  bool flag = false;
+  for (auto & i : user_stack) {
+    if (i.first.user_ID == user_id_) {
+      flag = true;
+      break;
+    }
+  }
+  return flag;
 }
 
 
