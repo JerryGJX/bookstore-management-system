@@ -31,6 +31,7 @@ class CommandParser {
   // 根据指令的第一个单词查找对应的函数，供 run 函数使用
   std::unordered_map<std::string, void (CommandParser::*)(vector<string> &)> mapFunction;
 
+  Log success, fail;
  public:
   void Run();  // 循环读入指令并解析，直到遇到 quit 或 exit
   // 构造 CommandParser，将其与所给的 UserManager，BookManager 和 Logger 关联起来
@@ -90,9 +91,11 @@ class CommandParser {
 
   bool CheckPriority(const int &);
 
-
-
   void PrintAll();
+
+  void WriteLogSuccess();
+
+  void WriteLogFail();
 };
 
 #endif //UNTITLED1_PARSER_HPP

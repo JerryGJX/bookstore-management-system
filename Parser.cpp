@@ -12,6 +12,9 @@ void CommandParser::Run() {
   std::string parser_carrier;
   if (std::getline(std::cin, parser_carrier)) {
     if (parser_carrier.size() > 1024)throw Error("LengthExceeded");
+    logger.FormLog(success, "success", parser_carrier, user_manager);
+    logger.FormLog(fail, "fail", parser_carrier, user_manager);
+
     std::istringstream iss(parser_carrier);
     //if (iss.eof())exit(0);
     std::string first;
@@ -207,7 +210,7 @@ void CommandParser::ParseReport(vector<string> &cmd) {
   if (!CheckPriority(7))throw Error("PermissionError");
 
   if (cmd.size() != 1)throw Error("SyntaxError");
-  if (cmd[0] == "myself")logger.ReportMyself();
+  if (cmd[0] == "myself")logger.ReportMyself(user_manager);
   else if (cmd[0] == "finance")logger.ReportFinance();
   else if (cmd[0] == "employee")logger.ReportEmployee();
   else throw Error("SyntaxError");
@@ -368,4 +371,12 @@ void CommandParser::PrintAll() {
     std::sort(target_book.begin(), target_book.end(), BookManager::cmp);
     for (auto &i: target_book) cout << i << endl;
   }
+}
+
+void CommandParser::WriteLogSuccess() {
+  logger.WriteLog(success);
+}
+void CommandParser::WriteLogFail() {
+  logger.WriteLog(fail);
+  //cout << fail << endl;
 }

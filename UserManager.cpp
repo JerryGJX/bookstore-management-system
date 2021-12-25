@@ -54,11 +54,11 @@ void UserManager::Login(const string &user_id, const string &password_) {
   for (auto &i: user_stack) {
     if (i.first.user_ID == user_id) {
       //flag = true;
-      carrier.second=i.second;
+      carrier.second = i.second;
     }
   }
-    user_stack.push_back(carrier);
-    //log_flag = true;
+  user_stack.push_back(carrier);
+  //log_flag = true;
 }
 
 void UserManager::Logout() {
