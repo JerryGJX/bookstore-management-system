@@ -314,7 +314,7 @@ bool CommandParser::QuantityCheck(const string &quantity_) {
 
 bool CommandParser::PriceCheck(const string &price_) {
   if (price_.size() > 13)return false;
-  for (char A: price_) { if (!std::isprint(A) && A != '.')return false; }
+  for (char A: price_) { if (!std::isdigit(A) && A != '.')return false; }
   return true;
 }
 
