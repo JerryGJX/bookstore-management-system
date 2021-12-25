@@ -80,7 +80,7 @@ class Book {
   Char<MaxOfName> name;
   Char<MaxOfAuthor> author;
   Char<MaxOfKeyword> keyword;
-  double quantity = 0;
+  long long quantity = 0;
   double price = 0;
   Book() = default;
   Book(const Book &);
