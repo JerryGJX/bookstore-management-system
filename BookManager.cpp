@@ -102,20 +102,16 @@ void BookManager::ImportBook(int quantity, double total_cost, UserManager &user_
 }
 
 void BookManager::ModifyIsbn(const string &isbn_, UserManager &user_manager_) {
-  int index_ = 0;
-  if (CheckExist(isbn_, index_)) {
-    if (index_ != user_manager_.GetNowIndex())throw Error("ISBNExist");
-  } else {
-    int index = user_manager_.GetNowIndex();
-    Book now_book;
-    book_info.Read(now_book, index);
-    Node old_node(now_book.ISBN, index);
-    now_book.ISBN = isbn_;
-    book_info.Update(now_book, index);
-    Node new_node(isbn_, index);
-    data_rank_by_ISBN.Del(old_node);
-    data_rank_by_ISBN.Add(new_node);
-  }
+  if (CheckExist(isbn_))throw Error("ISBNExist");
+  int index = user_manager_.GetNowIndex();
+  Book now_book;
+  book_info.Read(now_book, index);
+  Node old_node(now_book.ISBN, index);
+  now_book.ISBN = isbn_;
+  book_info.Update(now_book, index);
+  Node new_node(isbn_, index);
+  data_rank_by_ISBN.Del(old_node);
+  data_rank_by_ISBN.Add(new_node);
 }
 void BookManager::ModifyName(const string &name_, UserManager &user_manager_) {
   int index = user_manager_.GetNowIndex();
@@ -216,16 +212,9 @@ void BookManager::BookNumAdd(const int &x) {
   book_num += x;
   book_info.WriteInfo(book_num);
 }
-bool BookManager::CheckExist(const string &isbn_, int &index_carrier) {
+bool BookManager::CheckExist(const string &isbn_) {
   std::vector<Book> target_book;
   GetTargetBook(data_rank_by_ISBN, target_book, isbn_);
-
-  if (!target_book.empty()) {
-    std::vector<int> target_index;
-    data_rank_by_ISBN.Query(isbn_, target_index);
-    index_carrier = target_index[0];
-  }
-
   return !target_book.empty();
 }
 
@@ -234,7 +223,7 @@ std::ostream &operator<<(std::ostream &os, const Book &rhs) {
   os << rhs.ISBN << '\t' << rhs.name << '\t' << rhs.author << '\t'
      << rhs.keyword << '\t';
 
-  os << std::fixed << std::setprecision(2) << rhs.price;
+    os << std::fixed << std::setprecision(2) << rhs.price;
 
   os << '\t' << std::fixed << std::setprecision(0) << rhs.quantity;
 
