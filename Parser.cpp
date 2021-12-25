@@ -122,9 +122,24 @@ void CommandParser::ParseShowBook(vector<string> &cmd) {
 
   if (cmd.empty())book_manager.ShowBook(BookManager::ALL);
   else if (cmd.size() == 1) {
-    string type_carrier = GetType(cmd[0], 20, 3);
-    string content = GetContent(cmd[0], 20, 3);
+    if (!cmd[0].starts_with('-'))throw Error("SyntaxError");
+    string type_carrier = GetType(cmd[0], 9, 3);
+
+    //cout << type_carrier << endl;
+
+    string content = GetContent(cmd[0], 9, 3);
+
+    //cout << content << endl;
+
+    if (type_carrier != "ISBN") {
+      if (!content.starts_with('\"') || !content.ends_with('\"'))throw Error("SyntaxError");
+      else {
+        string carrier = content.substr(1, content.size());
+        content = carrier;
+      }
+    }
     if (content.empty())throw Error("SyntaxError");
+
     if (type_carrier == "ISBN") {
       if (IsbnCheck(content)) book_manager.ShowBook(BookManager::ISBN, content); else throw Error("SyntaxError");
     } else if (type_carrier == "name") {
@@ -164,9 +179,19 @@ void CommandParser::ParseModify(vector<string> &cmd) {
   int num = static_cast<int>(cmd.size());
   std::unordered_map<string, string> info_to_change;
   for (int i = 0; i < num; ++i) {
-    string type = GetType(cmd[i], 20, 3);
-    string content = GetContent(cmd[i], 20, 3);
+    string type = GetType(cmd[i], 9, 3);
+    string content = GetContent(cmd[i], 9, 3);
     if (content.empty())throw Error("SyntaxError");
+
+    if (type != "ISBN") {
+      if (!content.starts_with('\"') || !content.ends_with('\"'))throw Error("SyntaxError");
+      else {
+        string carrier = content.substr(1, content.size());
+        content = carrier;
+      }
+    }
+    if (content.empty())throw Error("SyntaxError");
+
     if (info_to_change.find(type) != info_to_change.end())throw Error("SyntaxError");
     if (type == "ISBN") {
       if (IsbnCheck(content)) {
@@ -327,6 +352,7 @@ string CommandParser::GetType(const string &cmd, const int &max_len, const int &
   while (cmd[i] != '=') {
     ++i;
     if (i > max_len)throw Error("SyntaxError");
+    if (i == cmd.size())throw Error("SyntaxError");
   }
   if (i < min_len)throw Error("SyntaxError");
   string type_carrier = cmd.substr(1, i - 1);
@@ -341,9 +367,10 @@ string CommandParser::GetContent(const string &cmd, const int &max_len, const in
     if (i > max_len)throw Error("SyntaxError");
   }
   if (i < min_len)throw Error("SyntaxError");
-  if (cmd[i + 1] != '"') {
-    carrier = cmd.substr(i + 1, cmd.size() - i - 1);
-  } else carrier = cmd.substr(i + 2, cmd.size() - i - 3);
+//  if (cmd[i + 1] != '\"') {
+  carrier = cmd.substr(i + 1, cmd.size() - i - 1);
+//  } else
+//    carrier = cmd.substr(i + 2, cmd.size() - i - 3);
   return carrier;
 }
 
