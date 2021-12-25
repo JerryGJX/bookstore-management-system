@@ -207,13 +207,16 @@ void CommandParser::ParseImport(vector<string> &cmd) {
 }
 
 void CommandParser::ParseReport(vector<string> &cmd) {
-  if (!CheckPriority(7))throw Error("PermissionError");
+  if (!CheckPriority(3))throw Error("PermissionError");
 
   if (cmd.size() != 1)throw Error("SyntaxError");
   if (cmd[0] == "myself")logger.ReportMyself(user_manager);
-  else if (cmd[0] == "finance")logger.ReportFinance();
-  else if (cmd[0] == "employee")logger.ReportEmployee();
-  else throw Error("SyntaxError");
+  else {
+    if (!CheckPriority(7))throw Error("PermissionError");
+    if (cmd[0] == "finance")logger.ReportFinance();
+    else if (cmd[0] == "employee")logger.ReportEmployee();
+    else throw Error("SyntaxError");
+  }
 }
 
 void CommandParser::ParseShowFinance(vector<string> &cmd) {
