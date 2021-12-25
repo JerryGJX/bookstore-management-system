@@ -11,30 +11,46 @@
 void CommandParser::Run() {
   std::string parser_carrier;
   if (std::getline(std::cin, parser_carrier)) {
-    if (parser_carrier.size() > 1024)throw Error("LengthExceeded");
-    logger.FormLog(success, "success", parser_carrier, user_manager);
-    logger.FormLog(fail, "fail", parser_carrier, user_manager);
 
-    std::istringstream iss(parser_carrier);
-    //if (iss.eof())exit(0);
-    std::string first;
-    iss >> first;
-    if (first == "exit" || first == "quit") {
-      std::string second;
-      if (iss >> second) throw Error("SyntaxError");
-      exit(0);
-    } else {
-      if (mapFunction.find(first) != mapFunction.end()) {
-        // PrintAll();
-        vector<string> split_parser;
-        while (!iss.eof()) {
-          string carrier;
-          iss >> carrier;
-          if (!carrier.empty()) split_parser.push_back(carrier);
-        }
-        (this->*mapFunction[first])(split_parser);
-      } else throw Error("SyntaxError");
+    if (parser_carrier.size() > 1024)throw Error("LengthExceeded");
+
+    bool all_blank_flag=true;
+    for(char i : parser_carrier){
+      if(i!=' '){
+        all_blank_flag=false;
+        break;
+      }
     }
+    if(!all_blank_flag){
+      logger.FormLog(success, "success", parser_carrier, user_manager);
+      logger.FormLog(fail, "fail", parser_carrier, user_manager);
+
+      std::istringstream iss(parser_carrier);
+      //if (iss.eof())exit(0);
+      std::string first;
+      iss >> first;
+
+      if (first == "exit" || first == "quit") {
+        std::string second;
+        if (iss >> second) throw Error("SyntaxError");
+        exit(0);
+      } else {
+        if (mapFunction.find(first) != mapFunction.end()) {
+          // PrintAll();
+          vector<string> split_parser;
+          while (!iss.eof()) {
+            string carrier;
+            iss >> carrier;
+            if (!carrier.empty()) split_parser.push_back(carrier);
+          }
+          (this->*mapFunction[first])(split_parser);
+        } else throw Error("SyntaxError");
+      }
+
+
+    }
+
+
   } else exit(0);
 }
 
@@ -326,12 +342,14 @@ bool CommandParser::KeywordRepeatCheck(const string &keyword_, const char &flag)
     if (keyword_[i] == flag) {
       r = i;
       carrier = keyword_.substr(l, r - l);
+      if(carrier.empty())throw Error("InvalidKeyword");
       if (x.find(carrier) == x.end())x.insert(carrier);
       else return false;
       //cout << carrier << endl;
     } else if (i == size - 1) {
       r = i;
       carrier = keyword_.substr(l, r - l + 1);
+      if(carrier.empty())throw Error("InvalidKeyword");
       if (x.find(carrier) == x.end())x.insert(carrier);
       else return false;
       //cout << carrier << endl;
