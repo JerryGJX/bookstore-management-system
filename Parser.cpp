@@ -134,7 +134,7 @@ void CommandParser::ParseShowBook(vector<string> &cmd) {
     if (type_carrier != "ISBN") {
       if (!content.starts_with('\"') || !content.ends_with('\"'))throw Error("SyntaxError");
       else {
-        string carrier = content.substr(1, content.size());
+        string carrier = content.substr(1, content.size()-2);
         content = carrier;
       }
     }
@@ -179,17 +179,28 @@ void CommandParser::ParseModify(vector<string> &cmd) {
   int num = static_cast<int>(cmd.size());
   std::unordered_map<string, string> info_to_change;
   for (int i = 0; i < num; ++i) {
+
     string type = GetType(cmd[i], 9, 3);
+
+    //cout << type << endl;
+
     string content = GetContent(cmd[i], 9, 3);
+
+    //cout << content << endl;
+
     if (content.empty())throw Error("SyntaxError");
 
-    if (type != "ISBN") {
+    if (type != "ISBN"&&type != "price") {
       if (!content.starts_with('\"') || !content.ends_with('\"'))throw Error("SyntaxError");
       else {
-        string carrier = content.substr(1, content.size());
+        string carrier = content.substr(1, content.size()-2);
         content = carrier;
       }
     }
+
+    //cout << content << endl;
+
+
     if (content.empty())throw Error("SyntaxError");
 
     if (info_to_change.find(type) != info_to_change.end())throw Error("SyntaxError");
