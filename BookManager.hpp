@@ -55,7 +55,7 @@ class BookManager {
 
   static void SplitString(const string &cmd, std::vector<string> &x, const char &flag);
 
-  bool CheckExist(const string &isbn_);
+  bool CheckExist(const string &isbn_,int &index_carrier);
 
   void GetTargetBook(UnrolledLinkedList<Node> &file, std::vector<Book> &, const string &arg);
 
