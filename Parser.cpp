@@ -329,6 +329,12 @@ bool CommandParser::AuthorCheck(const string &author_) {
 }
 
 bool CommandParser::KeywordCheck(const string &keyword_) {
+  if (keyword_.size() > MaxOfName)return false;
+  for (char A: keyword_) { if (!std::isprint(A) || A == '\"')return false; }
+  if(keyword_.starts_with("|")||keyword_.ends_with("|"))return false;
+  return true;
+
+
   return BookNameCheck(keyword_);
 }
 
