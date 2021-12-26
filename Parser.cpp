@@ -14,42 +14,51 @@ void CommandParser::Run() {
 
     if (parser_carrier.size() > 1024)throw Error("LengthExceeded");
 
-    bool all_blank_flag=true;
-    for(char i : parser_carrier){
-      if(i!=' '){
-        all_blank_flag=false;
+    bool all_blank_flag = true;
+    for (char i: parser_carrier) {
+      if (i != ' ') {
+        all_blank_flag = false;
         break;
       }
     }
-    if(!all_blank_flag){
+    if (!all_blank_flag) {
       logger.FormLog(success, "success", parser_carrier, user_manager);
       logger.FormLog(fail, "fail", parser_carrier, user_manager);
 
-      std::istringstream iss(parser_carrier);
-      //if (iss.eof())exit(0);
+      vector<string> parser_list;
+      std::vector<string> parser_list_to_use;
+
+      SplitString(parser_carrier, parser_list, ' ');
       std::string first;
-      iss >> first;
+      first = parser_list[0];
+
+      for (int i=0;i<parser_list.size();++i){
+        if(i)parser_list_to_use.push_back(parser_list[i]);
+      }
+
+//      std::istringstream iss(parser_carrier);
+//      //if (iss.eof())exit(0);
+
+      //iss >> first;
 
       if (first == "exit" || first == "quit") {
-        std::string second;
-        if (iss >> second) throw Error("SyntaxError");
+        //std::string second;
+        if (parser_list.size() != 1) throw Error("SyntaxError");
         exit(0);
       } else {
         if (mapFunction.find(first) != mapFunction.end()) {
           // PrintAll();
-          vector<string> split_parser;
-          while (!iss.eof()) {
-            string carrier;
-            iss >> carrier;
-            if (!carrier.empty()) split_parser.push_back(carrier);
-          }
-          (this->*mapFunction[first])(split_parser);
+//          vector<string> split_parser;
+//          while (!iss.eof()) {
+//            string carrier;
+//            iss >> carrier;
+//            if (!carrier.empty()) split_parser.push_back(carrier);
+//          }
+          (this->*mapFunction[first])(parser_list_to_use);
         } else throw Error("SyntaxError");
       }
 
-
     }
-
 
   } else exit(0);
 }
@@ -150,7 +159,7 @@ void CommandParser::ParseShowBook(vector<string> &cmd) {
     if (type_carrier != "ISBN") {
       if (!content.starts_with('\"') || !content.ends_with('\"'))throw Error("SyntaxError");
       else {
-        string carrier = content.substr(1, content.size()-2);
+        string carrier = content.substr(1, content.size() - 2);
         content = carrier;
       }
     }
@@ -206,10 +215,10 @@ void CommandParser::ParseModify(vector<string> &cmd) {
 
     if (content.empty())throw Error("SyntaxError");
 
-    if (type != "ISBN"&&type != "price") {
+    if (type != "ISBN" && type != "price") {
       if (!content.starts_with('\"') || !content.ends_with('\"'))throw Error("SyntaxError");
       else {
-        string carrier = content.substr(1, content.size()-2);
+        string carrier = content.substr(1, content.size() - 2);
         content = carrier;
       }
     }
@@ -331,9 +340,8 @@ bool CommandParser::AuthorCheck(const string &author_) {
 bool CommandParser::KeywordCheck(const string &keyword_) {
   if (keyword_.size() > MaxOfName)return false;
   for (char A: keyword_) { if (!std::isprint(A) || A == '\"')return false; }
-  if(keyword_.starts_with("|")||keyword_.ends_with("|"))return false;
+  if (keyword_.starts_with("|") || keyword_.ends_with("|"))return false;
   return true;
-
 
   return BookNameCheck(keyword_);
 }
@@ -348,14 +356,14 @@ bool CommandParser::KeywordRepeatCheck(const string &keyword_, const char &flag)
     if (keyword_[i] == flag) {
       r = i;
       carrier = keyword_.substr(l, r - l);
-      if(carrier.empty())throw Error("InvalidKeyword");
+      if (carrier.empty())throw Error("InvalidKeyword");
       if (x.find(carrier) == x.end())x.insert(carrier);
       else return false;
       //cout << carrier << endl;
     } else if (i == size - 1) {
       r = i;
       carrier = keyword_.substr(l, r - l + 1);
-      if(carrier.empty())throw Error("InvalidKeyword");
+      if (carrier.empty())throw Error("InvalidKeyword");
       if (x.find(carrier) == x.end())x.insert(carrier);
       else return false;
       //cout << carrier << endl;
@@ -374,7 +382,16 @@ bool CommandParser::QuantityCheck(const string &quantity_) {
 
 bool CommandParser::PriceCheck(const string &price_) {
   if (price_.size() > 13)return false;
-  for (char A: price_) { if (!std::isdigit(A) && A != '.')return false; }
+  //if (price_.size() > 13)return false;
+  int dot_num = 0;
+  int digit_num = 0;
+  for (char A: price_) {
+    if (!std::isdigit(A) && A != '.')return false;
+    if (A == '.')dot_num++;
+    else digit_num++;
+  }
+  if (dot_num != 0 && dot_num != 1)return false;
+  if (digit_num == 0)return false;
   return true;
 }
 
@@ -444,4 +461,23 @@ void CommandParser::WriteLogSuccess() {
 void CommandParser::WriteLogFail() {
   logger.WriteLog(fail);
   //cout << fail << endl;
+}
+void CommandParser::SplitString(const string &cmd, vector<string> &x, const char &flag) {
+  int l = cmd.find_first_not_of(flag), r = cmd.find_last_not_of(flag) ;
+  int l_pointer = l, r_pointer = l;
+  string carrier;
+  for (int i = l; i <= r; ++i) {
+    if (cmd[i] == flag) {
+      r_pointer = i;
+      carrier = cmd.substr(l_pointer, r_pointer - l_pointer);
+      x.push_back(carrier);
+      while(cmd[i]==flag&&(i+1)<=r)++i;
+      l_pointer=i;
+      i--;
+    } else if (i == r) {
+      r_pointer = i;
+      carrier = cmd.substr(l_pointer, r_pointer - l_pointer + 1);
+      x.push_back(carrier);
+    }
+  }
 }

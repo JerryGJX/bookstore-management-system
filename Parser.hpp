@@ -59,6 +59,10 @@ class CommandParser {
   void ParseShowFinance(vector<string> &cmd);  // 解析 show finance ([Time])?
   void ParseLog(vector<string> &cmd);  // 解析 log
 
+
+
+  static void SplitString(const string &cmd, std::vector<string> &x, const char &flag);
+
   static string GetType(const string &cmd, const int &max_len, const int &min_len);
 
   static string GetContent(const string &cmd, const int &max_len, const int &min_len);
