@@ -15,11 +15,11 @@ struct Char {
   char content[maxLength + 1]{};
   // 默认为空字符串
   Char() {
-    memset(this->content, '\0', strlen(content) + 1);
+    memset(this->content, '\0', sizeof(content));
   };
 
   Char(const std::string &s) {
-    memset(this->content, '\0', strlen(content) + 1);
+    memset(this->content, '\0', sizeof(content));
     strcpy(content, s.c_str());
   };
 
