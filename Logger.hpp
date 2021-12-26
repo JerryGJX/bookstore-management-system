@@ -43,12 +43,12 @@ class Log {
 };
 
 class Logger {
-  MemoryRiver<Finance, IntWrapper, sizeof(int)> finance_data;
+  MemoryRiver<Finance, LongLongWrapper, sizeof(LongLongWrapper)> finance_data;
   UnrolledLinkedList<NodeDigit> finance_list;
 
-  MemoryRiver<Log, IntWrapper, sizeof(int)> log_data;
+  MemoryRiver<Log, LongLongWrapper, sizeof(LongLongWrapper)> log_data;
   UnrolledLinkedList<Node> log_rank_by_userid;
-  IntWrapper finance_num = 0, log_num = 0;
+  LongLongWrapper finance_num = 0, log_num = 0;
  public:
   Logger(const string &finance_list_, const string &finance_data_,
          const string &log_data_, const string &log_rank_by_userid);

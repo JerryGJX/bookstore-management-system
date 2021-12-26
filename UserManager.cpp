@@ -70,12 +70,12 @@ void UserManager::Logout() {
 void UserManager::ChangePassword(const string &user_id, const string &new_password, const string &old_password) {
   int index;
   if (!FindId(user_id, index))throw Error("UserNotExist");
-  User to_log_user;
-  user_database.Read(to_log_user, index);
-  if ((!old_password.empty()) && (to_log_user.password != old_password))throw Error("IncorrectPassword");
+  User to_change_user;
+  user_database.Read(to_change_user, index);
+  if ((!old_password.empty()) && (to_change_user.password != old_password))throw Error("IncorrectPassword");
   if (GetNowPriority() != OWNERPRIORITY && old_password.empty())throw Error("IncorrectPassword");
-  to_log_user.password = new_password;
-  user_database.Update(to_log_user, index);
+  to_change_user.password = new_password;
+  user_database.Update(to_change_user, index);
 }
 
 void UserManager::CreateUser(const string &user_id,

@@ -45,37 +45,37 @@ bool NodeDigit::operator==(const NodeDigit &x) const { return (key == x.key && v
 
 bool NodeDigit::operator!=(const NodeDigit &x) const { return (key != x.key || value != x.value); }
 
-IntWrapper::IntWrapper(const int &x) {
+LongLongWrapper::LongLongWrapper(const long long &x) {
   a = x;
 }
-IntWrapper::IntWrapper(IntWrapper &x) {
+LongLongWrapper::LongLongWrapper(LongLongWrapper &x) {
   a = x.a;
 }
-bool IntWrapper::operator==(const IntWrapper &rhs) const {
+bool LongLongWrapper::operator==(const LongLongWrapper &rhs) const {
   return a == rhs.a;
 }
-bool IntWrapper::operator!=(const IntWrapper &rhs) const {
+bool LongLongWrapper::operator!=(const LongLongWrapper &rhs) const {
   return !(rhs == *this);
 }
-IntWrapper &IntWrapper::operator=(const IntWrapper &rhs) = default;
-std::ostream &operator<<(std::ostream &os, const IntWrapper &wrapper) {
+LongLongWrapper &LongLongWrapper::operator=(const LongLongWrapper &rhs) = default;
+std::ostream &operator<<(std::ostream &os, const LongLongWrapper &wrapper) {
   os << wrapper.a;
   return os;
 }
-bool IntWrapper::operator<(const IntWrapper &rhs) const {
+bool LongLongWrapper::operator<(const LongLongWrapper &rhs) const {
   return a < rhs.a;
 }
-bool IntWrapper::operator>(const IntWrapper &rhs) const {
+bool LongLongWrapper::operator>(const LongLongWrapper &rhs) const {
   return rhs < *this;
 }
-bool IntWrapper::operator<=(const IntWrapper &rhs) const {
+bool LongLongWrapper::operator<=(const LongLongWrapper &rhs) const {
   return !(rhs < *this);
 }
-bool IntWrapper::operator>=(const IntWrapper &rhs) const {
+bool LongLongWrapper::operator>=(const LongLongWrapper &rhs) const {
   return !(*this < rhs);
 }
-IntWrapper IntWrapper::operator++(int) {
-  IntWrapper carrier;
+const LongLongWrapper LongLongWrapper::operator++(int) {
+  LongLongWrapper carrier;
   carrier=*this;
   a++;
   return carrier;

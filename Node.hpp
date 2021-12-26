@@ -31,21 +31,21 @@ struct NodeDigit {
   bool operator!=(const NodeDigit &) const;
 };
 
-struct IntWrapper {
-  int a = 0;
-  IntWrapper() = default;
-  IntWrapper(const int &);
-  IntWrapper(IntWrapper &x);
-  operator int() const { return a; };
-  bool operator==(const IntWrapper &rhs) const;
-  bool operator!=(const IntWrapper &rhs) const;
-  IntWrapper &operator=(const IntWrapper &rhs);
-  friend std::ostream &operator<<(std::ostream &os, const IntWrapper &wrapper);
-  bool operator<(const IntWrapper &rhs) const;
-  bool operator>(const IntWrapper &rhs) const;
-  bool operator<=(const IntWrapper &rhs) const;
-  bool operator>=(const IntWrapper &rhs) const;
-  IntWrapper operator++(int);
+struct LongLongWrapper {
+  long long a = 0;
+  LongLongWrapper() = default;
+  LongLongWrapper(const long long &);
+  LongLongWrapper(LongLongWrapper &x);
+  operator long long() const { return a; };
+  bool operator==(const LongLongWrapper &rhs) const;
+  bool operator!=(const LongLongWrapper &rhs) const;
+  LongLongWrapper &operator=(const LongLongWrapper &rhs);
+  friend std::ostream &operator<<(std::ostream &os, const LongLongWrapper &wrapper);
+  bool operator<(const LongLongWrapper &rhs) const;
+  bool operator>(const LongLongWrapper &rhs) const;
+  bool operator<=(const LongLongWrapper &rhs) const;
+  bool operator>=(const LongLongWrapper &rhs) const;
+  const LongLongWrapper operator++(int);
 };
 
 #endif //MAIN_CPP__NODE_HPP_

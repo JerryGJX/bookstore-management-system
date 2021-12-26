@@ -208,7 +208,9 @@ void BookManager::GetTargetBook(UnrolledLinkedList<Node> &file, std::vector<Book
 }
 
 void BookManager::BookNumAdd(const int &x) {
-  book_info.GetInfo(book_num);
+  LongLongWrapper book_num_carrier;
+  book_info.GetInfo(book_num_carrier);
+  book_num = book_num_carrier;
   book_num += x;
   book_info.WriteInfo(book_num);
 }
@@ -223,7 +225,7 @@ std::ostream &operator<<(std::ostream &os, const Book &rhs) {
   os << rhs.ISBN << '\t' << rhs.name << '\t' << rhs.author << '\t'
      << rhs.keyword << '\t';
 
-    os << std::fixed << std::setprecision(2) << rhs.price;
+  os << std::fixed << std::setprecision(2) << rhs.price;
 
   os << '\t' << std::fixed << std::setprecision(0) << rhs.quantity;
 

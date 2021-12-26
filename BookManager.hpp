@@ -26,12 +26,12 @@ class Book;
 class Logger;
 class BookManager {
  public:
-  MemoryRiver<Book, int, sizeof(int)> book_info;
+  MemoryRiver<Book, LongLongWrapper, sizeof(LongLongWrapper)> book_info;
   UnrolledLinkedList<Node> data_rank_by_ISBN;
   UnrolledLinkedList<Node> data_rank_by_name;
   UnrolledLinkedList<Node> data_rank_by_author;
   UnrolledLinkedList<Node> data_rank_by_keyword;
-  int book_num = 0;
+  long long book_num = 0;
   //UserManager &user_manager_;
 
 
