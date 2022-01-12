@@ -57,24 +57,24 @@ class CommandParser {
   // 构造 CommandParser，将其与所给的 UserManager，BookManager 和 Logger 关联起来
   CommandParser(UserManager &user_manager_, BookManager &book_manager_, Logger &logger_);
 
-  void ParseSu(const char *cmd);  // 解析 su [User-ID] ([Password])?
-  void ParseLogout(const char *cmd);  // 解析 logout
-  void ParseRegister(const char *cmd);  // 解析 register [User-ID] [Password] [User-Name]
-  void ParsePasswd(const char *cmd);  // 解析 passwd [User-ID] ([Old-Password])? [New-Password]
-  void ParseUseradd(const char *cmd);  // 解析 useradd [User-ID] [Password] [Priority] [User-Name]
-  void ParseDelete(const char *cmd);  // 解析 delete [User-ID]
+  void ParseSu(vector<string> &cmd);  // 解析 su [User-ID] ([Password])?
+  void ParseLogout(vector<string> &cmd);  // 解析 logout
+  void ParseRegister(vector<string> &cmd);  // 解析 register [User-ID] [Password] [User-Name]
+  void ParsePasswd(vector<string> &cmd);  // 解析 passwd [User-ID] ([Old-Password])? [New-Password]
+  void ParseUseradd(vector<string> &cmd);  // 解析 useradd [User-ID] [Password] [Priority] [User-Name]
+  void ParseDelete(vector<string> &cmd);  // 解析 delete [User-ID]
 
-  void ParseShow(const char *cmd);  // 解析 show，调用 showBook 或 showFinance
+  void ParseShow(vector<string> &cmd);  // 解析 show，调用 showBook 或 showFinance
 
-  void ParseShowBook(const char *cmd);  // 解析 show (-ISBN=[ISBN] | -name="[Book-Name]" | -author="[Author]" | -keyword="[Keyword]")?
-  void ParseBuy(const char *cmd);  // 解析 buy [ISBN] [Quantity]
-  void ParseSelect(const char *cmd);  // 解析 select [ISBN]
-  void ParseModify(const char *cmd);  // 解析 modify (-ISBN=[ISBN] | -name="[Book-Name]" | -author="[Author]" | -keyword="[Keyword]" | -price=[Price])+
-  void ParseImport(const char *cmd);  // 解析 import [Quantity] [Total-Cost]
+  void ParseShowBook(vector<string> &cmd);  // 解析 show (-ISBN=[ISBN] | -name="[Book-Name]" | -author="[Author]" | -keyword="[Keyword]")?
+  void ParseBuy(vector<string> &cmd);  // 解析 buy [ISBN] [Quantity]
+  void ParseSelect(vector<string> &cmd);  // 解析 select [ISBN]
+  void ParseModify(vector<string> &cmd);  // 解析 modify (-ISBN=[ISBN] | -name="[Book-Name]" | -author="[Author]" | -keyword="[Keyword]" | -price=[Price])+
+  void ParseImport(vector<string> &cmd);  // 解析 import [Quantity] [Total-Cost]
 
-  void ParseReport(const char *cmd);  // 解析 report myself 或 report finance 或 report employee
-  void ParseShowFinance(const char *cmd);  // 解析 show finance ([Time])?
-  void ParseLog(const char *cmd);  // 解析 log
+  void ParseReport(vector<string> &cmd);  // 解析 report myself 或 report finance 或 report employee
+  void ParseShowFinance(vector<string> &cmd);  // 解析 show finance ([Time])?
+  void ParseLog(vector<string> &cmd);  // 解析 log
 };
 ```
 
@@ -122,20 +122,30 @@ class User {
  public:
   Char<30> user_ID;
   Char<30> user_name;
-  int priority;  // 权限，可以取 7 或 3 或 1
+  int priority = 0;  // 权限，可以取 7 或 3 或 1
 };
 
 class UserManager {
  private:
+    UnrolledLinkedList<Node> user_data_list;//id to position in memory_river
+  MemoryRiver<User, int, 0> user_database;
   std::vector<std::pair<User, int>> user_stack;  // 用户栈，储存登录的用户和他所选的图书的 offset
 
- public:
-  int Login(const char* user_id);  // 登录用户
-  int Logout();  // 退出登录
-  int ChangePassword(const char* user_id, const char* old_password, const char* new_password);  // 修改密码
-  int CreateUser(const char* user_id, const char* password, const int priority, const char* user_name);  // 创建用户
-  int Register(const char* user_id, const char* password, const char* user_name);  // 注册账户
-  int Remove(const char* user_id);  // 删除账户
+public:
+  UserManager(const string &user_data_list_, const string &user_database_);
+  void Login(const string &user_id, const string &password_ = "");  // 登录用户
+  void Logout();  // 退出登录
+  void ChangePassword(const string &user_id, const string &new_password, const string &old_password = "");  // 修改密码
+  void CreateUser(const string &user_id, const string &password, const int &priority, const string &user_name);  // 创建用户
+  void Register(const string &user_id, const string &password, const string &user_name);  // 注册账户
+  void Remove(const string &user_id);  // 删除账户
+
+  bool FindId(const string &user_id_, int &index_);
+  int GetNowPriority();
+  string GetNowId();
+  int GetNowIndex();
+  void ChangeNowIndex(const int &index_);
+  bool LoginFlag(const string&user_id_);
 };
 ```
 
@@ -145,11 +155,25 @@ class UserManager {
 
 ```cpp
 class Book {
+  friend std::ostream &operator<<(std::ostream &, const Book &);
  public:
-  Char<20> ISBN;
-  Char<60> name, author;
-  Char<60> keyword;
-  int quantity, price;
+  Char<MaxOfIsbn> ISBN;
+  Char<MaxOfName> name;
+  Char<MaxOfAuthor> author;
+  Char<MaxOfKeyword> keyword;
+  long long quantity = 0;
+  double price = 0;
+  Book() = default;
+  Book(const Book &);
+  explicit Book(const string &ISBN_,
+                const string &name_ = "",
+                const string &author_ = "",
+                const string &keyword_ = "",
+                const int &quantity_ = 0,
+                const int &price_ = 0);
+  bool operator==(const Book &rhs) const;
+  bool operator!=(const Book &rhs) const;
+
 };
 ```
 
@@ -160,13 +184,50 @@ class Book {
 ```cpp
 class BookManager {
  public:
-  enum ParaType {ISBN, NAME, AUTHOR, KEYWORD};  // 参数类型
-  void ShowBook(ParaType para_type, const char *arg);  // 检索图书
-  void BuyBook(const char *ISBN, int quantity);  // 购买图书
-  void SelectBook(const char *ISBN);  // 以当前账户选中指定图书
-  void ModifyBook(ParaType para_type, const char *arg);  // 更新选中图书的信息
-  void ModifyBook(ParaType para_type, int price);  // 更新选中图书的信息
-  void ImportBook(int quantity, double total_cost);  // 指定交易总额购入指定数量的选中图书
+  MemoryRiver<Book, LongLongWrapper, sizeof(LongLongWrapper)> book_info;
+  UnrolledLinkedList<Node> data_rank_by_ISBN;
+  UnrolledLinkedList<Node> data_rank_by_name;
+  UnrolledLinkedList<Node> data_rank_by_author;
+  UnrolledLinkedList<Node> data_rank_by_keyword;
+  long long book_num = 0;
+  //UserManager &user_manager_;
+
+
+
+ public:
+  enum ParaType { ISBN, NAME, AUTHOR, KEYWORD, ALL };  // 参数类型
+  BookManager(const string &book_info_,
+              const string &by_ISBN_,
+              const string &by_name_,
+              const string &by_author_,
+              const string &by_keyword_);
+
+  static bool cmp(const Book &a, const Book &b);
+
+  void ShowBook(ParaType para_type, const string &arg = "");  // 检索图书
+  void BuyBook(const string &ISBN, int quantity, Logger &logger_);  // 购买图书
+  void SelectBook(const string &ISBN, UserManager &user_manager_);  // 以当前账户选中指定图书
+  void ModifyBook(const unordered_map<string, string> &cmd, UserManager &user_manager_);  // 更新选中图书的信息
+  //void ModifyBook(ParaType para_type, int price);  // 更新选中图书的信息
+  void ImportBook(int quantity, double total_cost, UserManager &user_manager_, Logger &logger_);  // 指定交易总额购入指定数量的选中图书
+
+  static void SplitString(const string &cmd, std::vector<string> &x, const char &flag);
+
+  bool CheckExist(const string &isbn_);
+
+  void GetTargetBook(UnrolledLinkedList<Node> &file, std::vector<Book> &, const string &arg);
+
+  void BookNumAdd(const int &);
+
+  void ModifyIsbn(const string &, UserManager &user_manager_);
+
+  void ModifyName(const string &, UserManager &user_manager_);
+
+  void ModifyAuthor(const string &, UserManager &user_manager_);
+
+  void ModifyKeywords(const string &, UserManager &user_manager_);
+
+  void ModifyPrice(const string &, UserManager &user_manager_);
 };
 ```
 
@@ -185,19 +246,57 @@ class BookManager {
 ```
 
 ```cpp
-class Logger {
-  UserManager &user_manager;
-  BookManager &book_manager;
+class Finance {
+ private:
+  double income = 0, expense = 0;
+
  public:
-  Logger(UserManager &user_manager_, BookManager &book_manager_);  // 与所给的 UserManager 和 BookManager 关联
+  Finance();
+  Finance(const double &);
+  Finance &operator+=(const Finance &);
+  friend std::ostream &operator<<(std::ostream &, const Finance &);
+  double GetIncome();
+  double GetExpense();
+};
+
+class Log {
+  int priority = 0;
+  Char<80> time_;
+  Char<20> flag;
+  Char<KEY_SIZE> user_id;
+  Char<LOGLEN> log;
+ public:
+  Log() = default;
+  Log(const string &flag_, const string &user_id_, const string &log_, const int &priority_);
+  Log(const Log &);
+  Log &operator=(const Log &rhs);
+  friend std::ostream &operator<<(std::ostream &, const Log &);
+  void GetTime();
+  int ThisPriority();
+  string ThisId();
+};
+
+class Logger {
+  MemoryRiver<Finance, LongLongWrapper, sizeof(LongLongWrapper)> finance_data;
+  UnrolledLinkedList<NodeDigit> finance_list;
+
+  MemoryRiver<Log, LongLongWrapper, sizeof(LongLongWrapper)> log_data;
+  UnrolledLinkedList<Node> log_rank_by_userid;
+  LongLongWrapper finance_num = 0, log_num = 0;
+ public:
+  Logger(const string &finance_list_, const string &finance_data_,
+         const string &log_data_, const string &log_rank_by_userid);
   void ShowFinance(int time = -1);  // 输出财务记录
-  void ReportMyself();  // 输出员工自己的操作记录
-  void ReportFinance();  // 生成财务记录报告 
-  void ReportWork();  // 生成全体员工工作情况报告
+  void WriteFinance(const double &);
+  void ReportMyself(UserManager &);  // 输出员工自己的操作记录
+  void ReportFinance();  // 生成财务记录报告
+  //void ReportWork();  // 生成全体员工工作情况报告
   void ReportEmployee();  // 生成员工工作情况表，记录其操作
   void ShowLog();  // 生成日志，包括谁干了什么，以及财务上每一笔交易
-  void Log(const char *command);  // 写入日志文件
+  void WriteLog(const Log &x);  // 写入日志文件
+  void FormLog(Log &, const string &flag, const string &command, UserManager &user_manager_);
 };
+
 ```
 
 ### 基础文件读写
@@ -205,19 +304,39 @@ class Logger {
 类似于 Memory River 的包含空间回收的文件读写类。用于存储 `books.dat` 中的图书信息。也用于写入 `finance.dat` 和 `log.dat`。
 
 ```cpp
-template <class ValueType, std::size_t info_len>
-class BasicFileIO {
- public:
-  BasicFileIO(const string &file_name) : file_name(file_name) {}
-  template <typename T>
-  void ReadInfo(T *info, std::size_t size, int index);  // 从信息区的指定位置读取信息
-  template <typename T>
-  void WriteInfo(T &info, std::size_t size, int index);  // 将信息写入信息区指定位置
+template<class T, class InfoType, int InfoLength>
+class MemoryRiver {
+ private:
 
-  int Write(ValueType &t);  // 新建并写入对象，返回 index
-  void Update(ValueType &value, const int index);  // 用 value 的值更新位置 index 对应的对象
-  void Read(ValueType &value, const int index);  // 读出 index 对应的对象并赋给 value
-  void Remove(int index);  // 删除 index 对应的对象
+  fstream file;
+  string file_name;
+  int sizeofT = sizeof(T);
+  int free_head = 0;
+ public:
+  MemoryRiver() = default;
+
+  MemoryRiver(const string &file_name);
+
+  //在文件合适位置写入类对象t，并返回写入的位置索引index
+  //位置索引意味着当输入正确的位置索引index，在以下三个函数中都能顺利的找到目标对象进行操作
+  //位置索引index可以取为对象写入的起始位置
+
+  void WriteInfo(const InfoType &info_);
+    
+  void GetInfo(InfoType &receiver) ;
+    
+  int ReturnInfoLength() ;
+
+  int Write(T &t) ;
+
+  //用t的值更新位置索引index对应的对象，保证调用的index都是由write函数产生
+  void Update(T &t, const int index) ;
+
+  //读出位置索引index对应的T对象的值并赋值给t，保证调用的index都是由write函数产生
+  void Read(T &t, const int index) ;
+
+  //删除位置索引index对应的对象(不涉及空间回收时，可忽略此函数)，保证调用的index都是由write函数产生
+  void Delete(int index);
 };
 ```
 
@@ -226,62 +345,45 @@ class BasicFileIO {
 有序地存放数据。用于读写 `*.index` 和 `users.dat`。
 
 ```cpp
-template <typename KeyType, typename ValueType>
+template<class NodeType>
 class UnrolledLinkedList {
+ private:
+  MemoryRiver<Block<NodeType>, BlockGallery<NodeType>, 		     sizeof(BlockGallery<NodeType>)> block_list;
+  BlockGallery<NodeType> block_info;
+
+  void DeleteBlock(const int &);
+
  public:
-  UnrolledLinkedList(const char *filename);
-  void Add(const KeyType &key, const ValueType &value);  // 添加键值对
-  void Remove(const KeyType &key, const ValueType &value);  // 删除键值对
-  void Find(const KeyType &key, std::vector<Value>) const;  // 查找 key，如果找不到，返回 end()
+  UnrolledLinkedList();
+
+  explicit UnrolledLinkedList(const std::string &);
+
+  void GetInfo();
+
+  void PutInfo();
+
+  bool Add(const NodeType &);
+
+  bool Del(const NodeType &);
+
+  bool Query(const std::string &, std::vector<int> &);
+
+  void GetAll(std::vector<NodeType> &find_list_);
 };
 ```
 
 ### 异常处理
 
-#### 基础异常类
-
-作为其他异常类的基类
-
-```cpp
-class BasicException : public std::exception {
-  const char *message;
-  BasicException(const char *message_);
-  const char *what() { return message; }
-};
-```
-
-#### 指令解析异常
-
-```cpp
-// 格式错误
-class SyntaxError : public BasicException {};
-```
-
 #### 用户管理异常
 
 ```cpp
-// 密码错误
-class IncorrectPassword : public BasicException {};
-// 用户名已存在
-class DuplicateUsername : public BasicException {};
-// 用户名不存在
-class UserNotExist : public BasicException {};
-// 权限错误
-class PermissionError : public BasicException {};
+class Error: public std::exception{
+    const string message;
+ public:
+  Error()=default;
+  Error(const string &error_disc);
+  Error(const Error &x);
+  friend std::ostream &operator<<(std::ostream &os, const Error &error) ；
+};
 ```
 
-#### 图书管理异常
-
-```cpp
-// 没有匹配的图书
-class NoBookMatched : public BasicException {};
-// 未选择图书
-class NoBookSelected : public BasicException {};
-```
-
-#### 日志异常
-
-```cpp
-// 超过历史交易总笔数
-class EntryNumExceeded : public BasicException {};
-```
